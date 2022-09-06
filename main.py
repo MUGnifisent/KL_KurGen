@@ -103,6 +103,7 @@ def create_personal_numbers():
             numbers.append([CODES[letter + 'Перша'],CODES[letter + 'Друга']])
         except:
             print(f"Літери {letter} немає у виданому коді.")
+            pause()
             exit()
 
     return numbers, listedLetters
