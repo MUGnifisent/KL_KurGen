@@ -1,4 +1,4 @@
-from math import log      #ver 0.0.9
+from math import log      #ver 0.0.10
 
 from utils.task1_utils import *
 
