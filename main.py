@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
 from task1 import task1_1, task1_2, task1_3, task1_4
+from task1_5 import task1_5
 
 
 CODES = {
@@ -93,7 +94,9 @@ def remove_duplicated_letters(str):
 
 
 def create_personal_numbers():
-    joinedLetters = remove_duplicated_letters(input("Введіть ваше прізвище, ім'я та побатькові: ").upper().replace(" ", ""))
+    # Temporary changed
+    joinedLetters = remove_duplicated_letters("Рибка Северин Орестович".upper().replace(" ", ""))
+    #joinedLetters = remove_duplicated_letters(input("Введіть ваше прізвище, ім'я та побатькові: ").upper().replace(" ", ""))
     listedLetters = [x for x in joinedLetters]
     while len(listedLetters) != 8:
         del listedLetters[-1]
@@ -113,9 +116,10 @@ if __name__ == '__main__':          #ver 0.0.10
     personalNumbers, listedLetters = create_personal_numbers()
     print(f"Букви, отримані з вашого імені:\n{listedLetters}")
     print(f"Цифри, перетворені через конвертаційну таблицю з вибраних букв:\n{personalNumbers}")
-    task1_1(personalNumbers)
-    task1_2(personalNumbers)
-    task1_3(personalNumbers)
-    task1_4(listedLetters, personalNumbers)
+    #task1_1(personalNumbers)
+    #task1_2(personalNumbers)
+    #task1_3(personalNumbers)
+    #task1_4(listedLetters, personalNumbers)
+    task1_5(personalNumbers)
     pause()
     
