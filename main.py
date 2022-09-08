@@ -1,7 +1,6 @@
 from collections import OrderedDict
 
 from task1 import task1_1, task1_2, task1_3, task1_4
-from task1_5 import task1_5
 
 
 CODES = {
@@ -120,6 +119,6 @@ if __name__ == '__main__':          #ver 0.0.10
     #task1_2(personalNumbers)
     #task1_3(personalNumbers)
     #task1_4(listedLetters, personalNumbers)
-    task1_5(personalNumbers)
+    #task1_5(personalNumbers)
     pause()
     
