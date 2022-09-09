@@ -1,4 +1,4 @@
-from math import log      #ver 0.0.10
+from math import log      #ver 0.0.11
 
 from utils.task1_utils import *
 
@@ -186,3 +186,97 @@ def task1_4(listedLetters, pn):
     print("\n\n")
     print(effectiveOutput + "  " + str(len(effectiveOutput) - effectiveOutput.count(' ')) + "біт")
     print(notEffectiveOutput + "  " + str(len(notEffectiveOutput) - notEffectiveOutput.count(' ')) + "біт")
+
+
+def task1_5(ll, pn):
+    print("\n\n1.5")
+    splitter()
+    
+    numberHex = f"{pn[0][0]}{pn[0][1]}{pn[7][0]}{pn[7][1]}"
+    numberBin = bin(int(numberHex, 16))[2:]
+    numberBin = full_form_bin(numberBin, 16)
+    
+    print(f"{ll[0]}: {numberHex[0:2]}; {ll[7]}: {numberHex[2:4]}; {numberHex}={numberBin}\n")
+    
+    controlPositions = get_control_pos(numberBin)
+    numberBinLst = convert_to_list(numberBin, controlPositions)
+    numberLen = len(numberBinLst)
+    
+    # Binary indeces for check matrix
+    binIndeces = []
+    for i in range(1, numberLen+1):
+        binIndeces.append(list(full_form_bin(bin(i)[2:], 5))) # remove constant "5"
+    
+    # Fill check matrix
+    checkMatrix = []
+    row = []
+    for i in range(len(binIndeces[0])): # range(5)
+        for j in range(len(binIndeces)):
+            row.append(int(binIndeces[j][i]))
+        checkMatrix.append(row.copy())
+        row.clear()
+
+    j = 0
+    for i in range(1, numberLen+1):
+        if i in controlPositions[j:]:
+            row.append(f"k{i}")
+            j += 1
+        else:
+            row.append(f"i{i}")
+    
+    checkMatrix.append(row.copy())
+    row.clear()
+    checkMatrix.append(numberBinLst.copy())
+    
+    # Calculate k1
+    k1, outStrCalck1 = calc_k1(numberBinLst, 'k')
+    # Calculate k2
+    k2, outStrCalck2 = calc_k2(numberBinLst, 'k')
+    # Calculate k4
+    k4, outStrCalck4 = calc_k4(numberBinLst, 'k')
+    # Calculate k8
+    k8, outStrCalck8 = calc_k8(numberBinLst, 'k')
+    # Calculate k16
+    k16, outStrCalck16 = calc_k16(numberBinLst, 'k')
+
+    checkMatrix[-1][0] = k1
+    checkMatrix[-1][1] = k2
+    checkMatrix[-1][3] = k4
+    checkMatrix[-1][7] = k8
+    checkMatrix[-1][15] = k16
+
+    # Imitation of a failure bit
+    posOfFailBit = random_fail_bit_pos(numberLen, controlPositions)
+    numberBinLst[posOfFailBit-1] = int(not numberBinLst[posOfFailBit-1])
+
+    # Calculate K1
+    k1_, outStrCalcK1 = calc_k1(numberBinLst, 'K')
+    # Calculate K2
+    k2_, outStrCalcK2 = calc_k2(numberBinLst, 'K')
+    # Calculate K4
+    k4_, outStrCalcK4 = calc_k4(numberBinLst, 'K')
+    # Calculate K8
+    k8_, outStrCalcK8 = calc_k8(numberBinLst, 'K')
+    # Calculate K16
+    k16_, outStrCalcK16 = calc_k16(numberBinLst, 'K')
+    
+    # Find position of the failure bit
+    posOfFailBit_ = f"{k16_^k16}{k8_^k8}{k4_^k4}{k2_^k2}{k1_^k1}"
+    outStrCalcFailBitPos = "K ⊕ k = (K16 ⊕ k16)(K8 ⊕ k8)(K4 ⊕ k4)(K2 ⊕ k2)(K1 ⊕ k1) = " \
+        f"({k16_} ⊕ {k16})({k8_} ⊕ {k8})({k4_} ⊕ {k4})({k2_} ⊕ {k2})({k1_} ⊕ {k1}) = {posOfFailBit_}"
+
+    print_table(checkMatrix, posOfFailBit)
+    print(outStrCalck1)
+    print(outStrCalck2)
+    print(outStrCalck4)
+    print(outStrCalck8)
+    print(outStrCalck16)
+    print("")
+    print(outStrCalcK1)
+    print(outStrCalcK2)
+    print(outStrCalcK4)
+    print(outStrCalcK8)
+    print(outStrCalcK16)
+    print("")
+    print(outStrCalcFailBitPos)
+    print(f"Значення {posOfFailBit_} вказує на те, що помилка сталася в {int(posOfFailBit_, 2)} біті ({posOfFailBit_}={int(posOfFailBit_, 2)}).")  
