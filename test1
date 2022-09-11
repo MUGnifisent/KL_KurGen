@@ -1,0 +1,6 @@
+
+
+abc = ['1010','11010']
+d = ['10102', '110101']
+abc.append(*list(filter(lambda x: '2' in x, d)))
+print(abc)

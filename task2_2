@@ -1,0 +1,183 @@
+from utils.task1_utils import *
+
+def CreateTableOfBinNum(LstOfBinNum, pn):
+    for i in range(8):
+        for j in range(2):
+            print(pn[i][j], end='\t')
+    print()
+    for i in range(4):
+        for j in range(16):
+            print(LstOfBinNum[j][i], end='\t')
+        print()
+
+def FindPosXInF(LstOfBinNum):
+    if LstOfBinNum[0][0] == '1':
+            StartPosXInF0 = 2
+            StartPosXInF1 = 0
+            StartPosXInF2 = 1
+    else:
+            for i in range(1, 4):
+                if LstOfBinNum[0][i] == '1':
+                    StartPosXInF0 = i-1
+                    StartPosXInF1 = i
+                    StartPosXInF2 = i+1
+                    break
+    if LstOfBinNum[4][0] == '1':
+        StartPosXInF3 = 2
+        StartPosXInF4 = 1
+    else:
+        for i in range(1, 4):
+            if LstOfBinNum[0][i] == '1':
+                StartPosXInF3 = i-1
+                StartPosXInF4 = i
+                break
+    return StartPosXInF0, StartPosXInF1, StartPosXInF2, StartPosXInF3, StartPosXInF4
+
+def FillFOfX(StartPosXInF, LstOfBinNum, letter, index):
+    if index == StartPosXInF:
+             print(f'({LstOfBinNum[letter][index%4]})x',end='\t')
+             StartPosXInF += 3
+    else:
+        print(LstOfBinNum[letter][index%4], end='\t')
+    return StartPosXInF
+
+def MergerBinNum(bin1, bin2):
+    count = 0
+    index = 0
+    for i in range(5):
+        if bin1[i] != bin2[i]:
+            count += 1
+            index = i 
+        if count == 2:
+            return -1
+    return bin1[:index] + '_' + bin1[index + 1:]
+    
+def SortInDictBy1(ListOfNum, abc):
+    SortDict = {}
+    for index in range(ListOfNum[-1].count('1')+1):
+        if list(filter(lambda x: x.count('1') == index, ListOfNum)) != []:
+            SortDict.update({chr(abc + index):list(filter(lambda x: x.count('1') == index, ListOfNum))})
+        else:
+            abc -= 1
+    return SortDict
+
+def ConvertDictToList(SortDict):
+    List = []
+    for key in SortDict.keys():
+        for index in range(len(SortDict[key])):
+            List.append([SortDict[key][index], f'{key}{index}', '-'])
+    return List
+
+def CreateListOfMerges(SortDictF0):
+    LstMerges = []
+    LstNameMerges = []
+    List1 = ConvertDictToList(SortDictF0)
+    for key in SortDictF0.keys():
+        scndkey = chr(ord(key) + 1)
+        if scndkey in SortDictF0.keys():
+            for item1 in range(len(SortDictF0[key])):
+                for item2 in range(len(SortDictF0[scndkey])):
+                    tempMerge = MergerBinNum(SortDictF0[key][item1], SortDictF0[scndkey][item2])
+                    if tempMerge != -1:
+                        if [SortDictF0[key][item1], f'{key}{item1}','-'] in List1:
+                            List1[List1.index([SortDictF0[key][item1], f'{key}{item1}', '-'])][2] = '+'
+                        if [SortDictF0[scndkey][item2], f'{scndkey}{item2}','-'] in List1:
+                            List1[List1.index([SortDictF0[scndkey][item2], f'{scndkey}{item2}','-'])][2] = '+'
+                        LstMerges.append(tempMerge)
+                        LstNameMerges.append([f'{key}{item1}{scndkey}{item2}'])
+    return LstMerges, List1, LstNameMerges
+
+#def GetNegativeNum(List):
+
+
+if __name__ == '__main__':
+    listedLetters = ['Х', 'А', 'Л', 'У', 'С', 'М', 'К', 'И']
+    pn = [[4, 4], [5, 4], [4, 8], [2, 6], [1, 8], [5, 5], [3, 8], [4, 6]]
+
+    LstOfBinNum = []
+    for i in range(8):
+        Num1Bin = bin(pn[i][0])[2:]
+        LstOfBinNum.append(Num1Bin.zfill(4))
+        Num2Bin = bin(pn[i][1])[2:]
+        LstOfBinNum.append(Num2Bin.zfill(4))
+    #print(*listedLetters, sep='    \t\t')
+    #CreateTableOfBinNum(LstOfBinNum, pn)
+    print('\n\n')
+    #print('Зміщення першого\nневизначеного\t\t\t\t\t\t-S\tS\t+S\t-S\tS\nзначення')
+    #print('№ набору\ta\tb\tc\td\te\tf0\tf1\tf2\tf3\tf4')
+    print('Зміщення першого\nневизначеного\t   \t-S\tS\t+S\t-S\tS\nзначення')
+    print('№ набору a b c d e\tf0\tf1\tf2\tf3\tf4')
+    BinNum0to31 = []
+    NumF0 = []
+    letter = -1
+    SetsForF0 = []
+    StartPosXInF0, StartPosXInF1, StartPosXInF2, StartPosXInF3, StartPosXInF4 = FindPosXInF(LstOfBinNum)
+    for i in range(32):
+        print(i,end='\t ')
+        BinNum0to31.append(bin(i)[2:].zfill(5))
+        for number in BinNum0to31[i]:
+            print(number, end=' ')
+        
+        if i%4 == 0:
+            letter += 1
+        print(end='\t')
+        if i == StartPosXInF0:
+             NumF0.append('x')
+             print(f'({LstOfBinNum[letter][i%4]})x',end='\t')
+             StartPosXInF0 += 3
+        else:
+            NumF0.append(LstOfBinNum[letter][i%4])
+            print(LstOfBinNum[letter][i%4], end='\t')
+        d = letter + 8
+        StartPosXInF1 = FillFOfX(StartPosXInF1, LstOfBinNum, letter, i)
+        StartPosXInF2 = FillFOfX(StartPosXInF2, LstOfBinNum, letter, i)
+        StartPosXInF3 = FillFOfX(StartPosXInF3, LstOfBinNum, d, i)
+        StartPosXInF4 = FillFOfX(StartPosXInF4, LstOfBinNum, d, i)
+         
+        if NumF0[i] == '1' or NumF0[i] == 'x':
+            SetsForF0.append(BinNum0to31[i])
+        print()
+    #print(*SetsForF0,sep='\n')
+
+    print('\n\n')
+    abc = 97
+    SortDict = SortInDictBy1(SetsForF0, abc)
+    ListMerge, list1, listname = CreateListOfMerges(SortDict)
+    AllDataForTable = []
+    AllDataForTable.append(list1)
+    AllDataForTable.append(listname)
+    print('К\tП\tУ', end='\t')
+    while True:
+        if list(filter(lambda x: x[2] == '+', list1)) == []:
+            break
+        print('С\tК\tП\tУ', end='\t')
+        abc += len(SortDict)
+        SortDict = SortInDictBy1(ListMerge, abc)
+        ListMerge, list1, listname = CreateListOfMerges(SortDict)
+        AllDataForTable.append(list1)
+        AllDataForTable.append(listname)
+    print()
+    MaxLen = len(max(AllDataForTable, key = lambda x: len(x)))
+    for index in range(MaxLen):
+        for table in AllDataForTable:
+            if index < len(table):
+                print(*table[index], sep='\t', end='\t')
+            else:
+                print('\t\t', end='\t')
+        print()
+    
+
+    AllNegative = []
+    for i in range(0,len(AllDataForTable), 2):
+        TempNegative = list(filter(lambda x: x[2] == '-', AllDataForTable[i]))
+        for item in TempNegative:
+            if item[0] not in AllNegative:
+                AllNegative.append(item[0])
+    #print(*AllNegative, sep = '\n')
+    ListCountLetter = [len(x.replace('_','')) for x in AllNegative]
+    #print(ListCountLetter)
+
+    LstF0Only1 = [BinNum0to31[i] for i in range(32) if NumF0[i] == '1']
+    print(*LstF0Only1, sep = '\n')
+    
+
