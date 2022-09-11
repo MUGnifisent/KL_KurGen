@@ -363,7 +363,6 @@ def random_fail_bit_pos(number_len, control_pos):
     for i in range(number_len):
         if (i+1) not in control_pos:
             l.append(i+1)
-    print(l)
     return choice(l)
 
 
