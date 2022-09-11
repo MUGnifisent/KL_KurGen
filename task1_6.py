@@ -1,4 +1,7 @@
+from tabulate import tabulate
+
 from itertools import chain
+
 #from main import create_personal_numbers
 from utils.task1_utils import *
 
@@ -24,6 +27,15 @@ KARNAUGH_MAP = {
     'B': ['9', 'A', '3', 'F'],
     'A': ['E', '2', 'B', '8']
 }
+
+
+KARNAUGH_MAP_TABLE = [
+    ['0', '1', '3', '2'],
+    ['4', '5', '7', '6'],
+    ['C', 'D', 'F', 'E'],
+    ['8', '9', 'B', 'A']
+]
+
 
 class Graph:
         
@@ -124,14 +136,17 @@ def delete_repeating_elements_from_list(l):
     return result
 
 def task1_6(pn):
+    print("\n\n1.6")
+
     m = Graph(KARNAUGH_MAP)
     conversionList = [str(i) for i in list(chain.from_iterable(pn))]
     print(f"Список переходів, трансформований з персональних кодів:")
     print_with_arrows(conversionList)
-    print("\n")
+    table = tabulate(KARNAUGH_MAP_TABLE, tablefmt="grid")
     for i in range(15):
+        splitter()
+        print(table)
         if conversionList[i] != conversionList[i + 1]:
-            splitter()
             b1 = str(bin(int(conversionList[i], 16)))
             b2 = str(bin(int(conversionList[i + 1], 16)))
             b1 = b1.lstrip("0b").zfill(4)
@@ -148,11 +163,7 @@ def task1_6(pn):
                     i = j
                     del i[0]
                     del i [-1]
-                    i = delete_repeating_elements_from_list(i)
                     for element in i:
-                        #b = b1 = str(bin(int(element, 16)))
-                        #b = b1.lstrip("0b").zfill(4)
-                        #p += f" {b},"
                         l.append(element)
                     l = delete_repeating_elements_from_list(l)
                 for element in l:
@@ -165,7 +176,6 @@ def task1_6(pn):
             else:
                 print("Помилкових кодів немає.")
         else:
-            splitter()
             b1 = str(bin(int(conversionList[i], 16)))
             b2 = str(bin(int(conversionList[i + 1], 16)))
             b1 = b1.lstrip("0b").zfill(4)
