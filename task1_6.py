@@ -154,9 +154,7 @@ def task1_6(pn):
                         #b = b1.lstrip("0b").zfill(4)
                         #p += f" {b},"
                         l.append(element)
-                    print(l)
                     l = delete_repeating_elements_from_list(l)
-                    print(l)
                 for element in l:
                     b = str(bin(int(element, 16)))
                     b = b.lstrip("0b").zfill(4)
