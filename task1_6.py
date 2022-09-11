@@ -143,15 +143,24 @@ def task1_6(pn):
 
             if len(n) != 1:
                 p = "Помилкові коди:"
+                l = []
                 for j in n:
                     i = j
                     del i[0]
                     del i [-1]
                     i = delete_repeating_elements_from_list(i)
                     for element in i:
-                        b = b1 = str(bin(int(element, 16)))
-                        b = b1.lstrip("0b").zfill(4)
-                        p += f" {b},"
+                        #b = b1 = str(bin(int(element, 16)))
+                        #b = b1.lstrip("0b").zfill(4)
+                        #p += f" {b},"
+                        l.append(element)
+                    print(l)
+                    l = delete_repeating_elements_from_list(l)
+                    print(l)
+                for element in l:
+                    b = str(bin(int(element, 16)))
+                    b = b.lstrip("0b").zfill(4)
+                    p += f" {b},"
                 p = p.rstrip(",")
                 p += "."
                 print(p)
@@ -171,7 +180,7 @@ if __name__ == '__main__':
     #personalNumbers, listedLetters = create_personal_numbers()
     #print(f"Букви, отримані з вашого імені:\n{listedLetters}")
     #print(f"Цифри, перетворені через конвертаційну таблицю з вибраних букв:\n{personalNumbers}")
-    personalNumbers = [[1, 3], [1, 1], [7, 1], [2, 6], [5, 6], [4, 7], [5, 1], [2, 3]]
+    personalNumbers = [[1, 3], [7, 9], [7, 1], [2, 6], [5, 6], [4, 7], [5, 1], [2, 3]]
     splitter()
     task1_6(personalNumbers)
     
