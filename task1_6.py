@@ -2,7 +2,7 @@ from tabulate import tabulate
 
 from itertools import chain
 
-#from main import create_personal_numbers
+from main import create_personal_numbers
 from utils.task1_utils import *
 
 
@@ -135,10 +135,16 @@ def delete_repeating_elements_from_list(l):
             result.append(i) 
     return result
 
-def task1_6(pn):
+def task1_6(pn, ll):
     print("\n\n1.6")
 
     m = Graph(KARNAUGH_MAP)
+
+    print("Персональні коди:")
+    for i in range(len(pn)):
+        print(f"{ll[i]} - {pn[i]} ", end='')
+    print()
+
     conversionList = [str(i) for i in list(chain.from_iterable(pn))]
     print(f"Список переходів, трансформований з персональних кодів:")
     print_with_arrows(conversionList)
@@ -185,10 +191,10 @@ def task1_6(pn):
 
 
 if __name__ == '__main__':
-    #personalNumbers, listedLetters = create_personal_numbers()
-    #print(f"Букви, отримані з вашого імені:\n{listedLetters}")
-    #print(f"Цифри, перетворені через конвертаційну таблицю з вибраних букв:\n{personalNumbers}")
-    personalNumbers = [[1, 3], [7, 9], [7, 1], [2, 6], [5, 6], [4, 7], [5, 1], [2, 3]]
+    personalNumbers, listedLetters = create_personal_numbers()
+    print(f"Букви, отримані з вашого імені:\n{listedLetters}")
+    print(f"Цифри, перетворені через конвертаційну таблицю з вибраних букв:\n{personalNumbers}")
+    #personalNumbers = [[1, 3], [7, 9], [7, 1], [2, 6], [5, 6], [4, 7], [5, 1], [2, 3]]
     splitter()
-    task1_6(personalNumbers)
+    task1_6(personalNumbers, listedLetters)
     
