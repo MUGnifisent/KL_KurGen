@@ -1,4 +1,4 @@
-from math import modf, log10, ceil, floor          #ver 0.1.1
+from math import modf, log10, ceil, floor          #ver 0.1.2
 from random import choice
 
 
