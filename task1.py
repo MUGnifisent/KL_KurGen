@@ -1,4 +1,7 @@
-from math import log      #ver 0.0.11
+from math import log                #ver 0.1.0
+from itertools import chain
+
+from tabulate import tabulate
 
 from utils.task1_utils import *
 
@@ -280,3 +283,58 @@ def task1_5(ll, pn):
     print("")
     print(outStrCalcFailBitPos)
     print(f"Значення {posOfFailBit_} вказує на те, що помилка сталася в {int(posOfFailBit_, 2)} біті ({posOfFailBit_}={int(posOfFailBit_, 2)}).")  
+
+
+def task1_6(pn, ll):
+    print("\n\n1.6")
+
+    m = Graph(KARNAUGH_MAP)
+
+    print("Персональні коди:")
+    for i in range(len(pn)):
+        print(f"{ll[i]} - {pn[i]} ", end='')
+    print()
+
+    conversionList = [str(i) for i in list(chain.from_iterable(pn))]
+    print(f"Список переходів, трансформований з персональних кодів:")
+    print_with_arrows(conversionList)
+    table = tabulate(KARNAUGH_MAP_TABLE, tablefmt="grid")
+    for i in range(15):
+        splitter()
+        print(table)
+        if conversionList[i] != conversionList[i + 1]:
+            b1 = str(bin(int(conversionList[i], 16)))
+            b2 = str(bin(int(conversionList[i + 1], 16)))
+            b1 = b1.lstrip("0b").zfill(4)
+            b2 = b2.lstrip("0b").zfill(4)
+            print(f"{conversionList[i]} -> {conversionList[i + 1]}: {b1} -> {b2}")
+            n = m.all_shortest_paths(conversionList[i], conversionList[i + 1])
+            for element in n:
+                print_with_arrows(element)
+
+            if len(n) != 1:
+                p = "Помилкові коди:"
+                l = []
+                for j in n:
+                    i = j
+                    del i[0]
+                    del i [-1]
+                    for element in i:
+                        l.append(element)
+                    l = delete_repeating_elements_from_list(l)
+                for element in l:
+                    b = str(bin(int(element, 16)))
+                    b = b.lstrip("0b").zfill(4)
+                    p += f" {b},"
+                p = p.rstrip(",")
+                p += "."
+                print(p)
+            else:
+                print("Помилкових кодів немає.")
+        else:
+            b1 = str(bin(int(conversionList[i], 16)))
+            b2 = str(bin(int(conversionList[i + 1], 16)))
+            b1 = b1.lstrip("0b").zfill(4)
+            b2 = b2.lstrip("0b").zfill(4)
+            print(f"{conversionList[i]} -> {conversionList[i + 1]}: {b1} -> {b2}\n")
+            print("Помилкових кодів немає.")

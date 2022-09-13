@@ -109,7 +109,7 @@ def create_personal_numbers():
     return numbers, listedLetters
 
 
-if __name__ == '__main__':          #ver 0.0.11
+if __name__ == '__main__':          #ver 0.1.0
     personalNumbers, listedLetters = create_personal_numbers()
     print(f"Букви, отримані з вашого імені:\n{listedLetters}")
     print(f"Цифри, перетворені через конвертаційну таблицю з вибраних букв:\n{personalNumbers}")
@@ -118,5 +118,6 @@ if __name__ == '__main__':          #ver 0.0.11
     task1_3(personalNumbers)
     task1_4(listedLetters, personalNumbers)
     task1_5(listedLetters, personalNumbers)
+    task1_6(personalNumbers, listedLetters)
     pause()
     
