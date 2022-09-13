@@ -1,4 +1,4 @@
-from math import log                #ver 0.1.0
+from math import log                #ver 0.1.1
 from itertools import chain
 
 from tabulate import tabulate
@@ -338,3 +338,12 @@ def task1_6(pn, ll):
             b2 = b2.lstrip("0b").zfill(4)
             print(f"{conversionList[i]} -> {conversionList[i + 1]}: {b1} -> {b2}\n")
             print("Помилкових кодів немає.")
+
+
+def task1(personalNumbers, listedLetters):
+    task1_1(personalNumbers)
+    task1_2(personalNumbers)
+    task1_3(personalNumbers)
+    task1_4(listedLetters, personalNumbers)
+    task1_5(listedLetters, personalNumbers)
+    task1_6(personalNumbers, listedLetters)
