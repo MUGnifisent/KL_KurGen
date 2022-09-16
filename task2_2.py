@@ -3,11 +3,11 @@ from utils.task1_utils import *
 def CreateTableOfBinNum(LstOfBinNum, pn):
     for i in range(8):
         for j in range(2):
-            print(pn[i][j], end='\t')
+            print(pn[i][j], end='   ')
     print()
     for i in range(4):
         for j in range(16):
-            print(LstOfBinNum[j][i], end='\t')
+            print(LstOfBinNum[j][i], end='   ')
         print()
 
 def FindPosXInF(LstOfBinNum):
@@ -102,8 +102,8 @@ def BinaryToLetters(Bin):
     letters = '' 
     #List0 = ['ā','ᵬ','c̄','đ','ē']
     #List0 = ['ā','ᵬ','ꞇ','đ','ē']
-    List0 = ['ā', 'ƀ', 'č', 'đ', 'ē']
-    List1 = ['a', 'b', 'c', 'd', 'e']
+    List0 = ['ē', 'đ', 'č', 'ƀ', 'ā']
+    List1 = ['e', 'd', 'c', 'b', 'a']
     for i in range(len(Bin)):
         if Bin[i] != '_':
             if Bin[i] == '1':
@@ -112,10 +112,105 @@ def BinaryToLetters(Bin):
                 letters += List0[i]
     return letters
 
+def PrintFunctionAmplicants(ListsWithAplicant, v, x):
+    for item in ListsWithAplicant:
+        if len(item) > 1:
+            print(f'({v.join([i for i in item])})', end='')
+        else:
+            print(item[0], end=' ')
+        if ListsWithAplicant.index(item) != len(ListsWithAplicant) - 1:
+            print(x,end='')
+
+def DelIdenticalInList(l):
+    n = []
+    for i in l:
+        if i not in n:
+            n.append(i)
+    return n
+
+def MultiplyAmplicants(ListAmplicants, DictLetters):
+    while len(ListAmplicants) != 1:
+        TempList = []
+        for multpy1 in ListAmplicants[0]:
+            for multpy2 in ListAmplicants[1]:  
+                tempSet0 = set()
+                if not isinstance(multpy1, set):
+                    tempSet0 = set([multpy1])
+                else:      
+                    tempSet0 = set(multpy1)
+                tempSet = tempSet0
+                tempSet.add(multpy2)
+                TempList.append(tempSet)
+        '''
+        ListOfSize = []
+        for item in TempList:
+            Size = 0
+            for mult in item:
+                Size += DictLetters[mult]
+            ListOfSize.append(Size)
+        print(TempList, end = ' = ')
+        MinSize = min(ListOfSize)
+        n = 0
+        for apSize in range(len(ListOfSize)):
+            if ListOfSize[apSize - n] > MinSize:
+                del TempList[apSize - n]
+                del ListOfSize[apSize - n]
+                n += 1
+        print(TempList)
+        '''
+        del ListAmplicants[0]
+        del ListAmplicants[0]
+        ListAmplicants.insert(0,TempList)
+    #print(f'\n{len(*ListAmplicants)}')
+    ListOfSize = []
+    for item in ListAmplicants[0]:
+        Size = 0
+        for mult in item:
+            Size += DictLetters[mult]
+        ListOfSize.append(Size)
+    MinSize = min(ListOfSize)
+
+    n = 0
+    for apSize in range(len(ListOfSize)):
+        if ListOfSize[apSize - n] > MinSize:
+            del ListAmplicants[0][apSize - n]
+            del ListOfSize[apSize - n]
+            n += 1
+    return DelIdenticalInList(ListAmplicants[0])
+
+def SimplifyingExpression(DictLetters, ListAplicants):
+    Result = [set(item) for item in ListAplicants]
+
+    for List in Result:
+        TempList = set()
+        MinLen = min([DictLetters[i] for i in List])
+        for index in List:
+            if DictLetters[index] == MinLen:
+                TempList.add(index)
+        Result[Result.index(List)] = TempList
+    
+    for item1 in Result:
+        for item2 in Result:
+            if item1.issubset(item2) and item1!=item2:
+                del Result[Result.index(item2)]
+
+    ListOneAplicant = set()
+    ListAmlicants = []
+    for i in Result:
+        if len(i) == 1:
+            ListOneAplicant.update(i)
+        else:
+            ListAmlicants.append(i)
+    CopyList = list(ListAmlicants)
+    ListResult = MultiplyAmplicants(CopyList, DictLetters)
+    return ListOneAplicant, ListAmlicants, ListResult
+    
 
 if __name__ == '__main__':
     listedLetters = ['Х', 'А', 'Л', 'У', 'С', 'М', 'К', 'И']
-    pn = [[4, 4], [5, 4], [4, 8], [2, 6], [1, 8], [5, 5], [3, 8], [4, 6]]
+    pn = [[4, 7], [5, 3], [2, 7], [6, 4], [1, 8], [5, 5], [3, 8], [4, 6]]
+
+    print('2.2')
 
     LstOfBinNum = []
     for i in range(8):
@@ -123,13 +218,14 @@ if __name__ == '__main__':
         LstOfBinNum.append(Num1Bin.zfill(4))
         Num2Bin = bin(pn[i][1])[2:]
         LstOfBinNum.append(Num2Bin.zfill(4))
-    #print(*listedLetters, sep='    \t\t')
-    #CreateTableOfBinNum(LstOfBinNum, pn)
+
+    print(' ', end=' ')
+    print(*listedLetters, sep=' '*7)
+    CreateTableOfBinNum(LstOfBinNum, pn)
+
     print('\n\n')
-    #print('Зміщення першого\nневизначеного\t\t\t\t\t\t-S\tS\t+S\t-S\tS\nзначення')
-    #print('№ набору\ta\tb\tc\td\te\tf0\tf1\tf2\tf3\tf4')
     print('Зміщення першого\nневизначеного\t   \t-S\tS\t+S\t-S\tS\nзначення')
-    print('№ набору a b c d e\tf0\tf1\tf2\tf3\tf4')
+    print('№ набору e d c b a\tf0\tf1\tf2\tf3\tf4')
     BinNum0to31 = []
     NumF0 = []
     letter = -1
@@ -160,7 +256,6 @@ if __name__ == '__main__':
         if NumF0[i] == '1' or NumF0[i] == 'x':
             SetsForF0.append(BinNum0to31[i])
         print()
-    #print(*SetsForF0,sep='\n')
 
     print('\n\n')
     abc = 97
@@ -189,40 +284,65 @@ if __name__ == '__main__':
                 print('\t\t', end='\t')
         print()
     
-
+    print('\n\n')
     AllNegative = []
     for i in range(0,len(AllDataForTable), 2):
         TempNegative = list(filter(lambda x: x[2] == '-', AllDataForTable[i]))
         for item in TempNegative:
             if item[0] not in AllNegative:
                 AllNegative.append(item[0])
-    #print(*AllNegative, sep = '\n')
+    
+    print('Прості імпліканти:')
+    print(*AllNegative, sep = ', ', end='.\n\n')
     ListCountLetter = [len(x.replace('_','')) for x in AllNegative]
-    #print(ListCountLetter)
     LstF0Only1 = [BinNum0to31[i] for i in range(32) if NumF0[i] == '1']
-    #print(*LstF0Only1, sep = '\n')
-    #Tablethree = []
-    print('\n\n')
+    ListsWithAplicant = []
     ListOfLetters = {f'I{i+1}':BinaryToLetters(AllNegative[i]) for i in range(len(AllNegative))}
     print('Одиничні', end='\t')
     print(*[item.ljust(5) for item in ListOfLetters.keys()], sep='\t')
     print('набори', end='\t\t')
     print(*[item.ljust(5) for item in ListOfLetters.values()], sep='\t')
-    print('abcde', end='\t\t')
+    print('edcba', end='\t\t')
     print(*AllNegative, sep='\t')
-    for set in LstF0Only1:
-        print(set, end='\t\t')
+    for Set in LstF0Only1:
+        print(Set, end='\t\t')
         TempList = []
-        for merge in AllNegative:
-            if CheckEqualityNums(set,merge):
-                print('+', end = '\t')
-                #TempList.append('*')
+        for merge in range(len(AllNegative)):
+            if CheckEqualityNums(Set,AllNegative[merge]):
+                print('V', end = '\t')
+                TempList.append(f'I{merge + 1}')
             else:
                 print('-', end = '\t')
-                #TempList.append(' ')
+        ListsWithAplicant.append(TempList)
         print('\n')
     print('Літер в\nімплакації', end='\t')
     print(*ListCountLetter, sep='\t')
-        #Tablethree.append(TempList)
-    #print(*Tablethree, sep = '\n')
+
+    print('\n\n')
+    DictOfCountLetters = {f'I{index + 1}':ListCountLetter[index] for index in range(len(ListCountLetter))}
+    print('Отримаємо функцію F:\nF =',end=' ')
+    PrintFunctionAmplicants(ListsWithAplicant, ' v ', ' ')
+    print('\nСпрощення:\nF =', end = ' ')
+
+    ListOneAmplicant, ListAmplicants, ListResults = SimplifyingExpression(DictOfCountLetters, ListsWithAplicant)
+    ListOneAmplicant = [''.join(i)  for i in ListOneAmplicant]
+    for i in ListResults:
+        i.update(ListOneAmplicant)
+    ListOneAmplicant = sorted(ListOneAmplicant, key = lambda x: int(x[1:]))
+    ListAmplicants = [sorted(list(i), key = lambda x: int(x[1:])) for i in ListAmplicants]
+    ListResults = [sorted(list(i), key = lambda x: int(x[1:])) for i in ListResults]
+    print(*ListOneAmplicant, sep=' ', end='')
+    PrintFunctionAmplicants(ListAmplicants, ' v ', ' ')
+    print(' = ', end='')
+    PrintFunctionAmplicants(ListResults, ' ', ' v ')
+    print(f'\n\nОтже, дана функція F має {len(ListResults)} мінімальні ДНФ:')
+    for i, dnf in enumerate(ListResults, 1):
+        print(f'{i}) F = ', end ='')
+        print(*[item.ljust(3) for item in dnf], sep=' v ', end =' = ')
+        print(*[ListOfLetters[item] for item in dnf], sep=' v ', end =';\n')
+
+
+
+
+
 

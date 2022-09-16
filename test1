@@ -1,4 +1,0 @@
-
-print(chr(int('E44D', 16)) + 'b')
-print('ā','b̅','c̄','đ','ē')
-print("b\u0180")
