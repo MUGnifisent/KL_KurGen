@@ -1,4 +1,4 @@
-from math import log                #ver 0.1.2
+from math import log                #ver 0.1.3
 from itertools import chain
 
 from tabulate import tabulate

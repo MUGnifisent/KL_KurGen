@@ -110,7 +110,7 @@ def create_personal_numbers():
     return numbers, listedLetters
 
 
-if __name__ == '__main__':              #ver 0.1.2
+if __name__ == '__main__':              #ver 0.1.3
     personalNumbers, listedLetters = create_personal_numbers()
     print(f"Букви, отримані з вашого імені:\n{listedLetters}")
     print(f"Цифри, перетворені через конвертаційну таблицю з вибраних букв:\n{personalNumbers}")
