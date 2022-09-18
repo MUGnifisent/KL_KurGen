@@ -5,6 +5,10 @@ from utils.task1_utils import *
 from utils.task2_utils import *
 
 
+def testPause():
+    program_pause = input("Press the <ENTER> key to continue...")
+
+
 KARNAUGH_MAP_2X = {
     '0': ['1', '4', '8', '2', '10'],
     '1': ['0', '3', '9', '5', '11'],
@@ -75,7 +79,7 @@ def generate_starting_tables(pn):
     return tt, f
 
 
-def task2_3(pn, ll):
+def task2_3(pn, ll, internetMode = False):
     print('\n\n2.3')
 
     TRUTH_TABLE, F0 = generate_starting_tables(pn)
@@ -84,8 +88,52 @@ def task2_3(pn, ll):
 
     print(tabulatedTable)
 
+    if internetMode == False:
+        #k = Graph(KARNAUGH_MAP_2X)
+        pass
+    else:
+        from selenium import webdriver
+        from selenium.webdriver.chrome.service import Service
+        from selenium.webdriver.chrome.options import Options
+        from webdriver_manager.chrome import ChromeDriverManager
 
-    k = Graph(KARNAUGH_MAP_2X)  
+        from selenium.webdriver.support.wait import WebDriverWait
+        from selenium.webdriver.common.by import By
+
+
+        SUBMIT = '/html/body/form/table/tbody/tr[1]/th[1]/input'
+
+
+        opts = Options()
+        opts.add_argument("--start-maximized")
+        opts.add_experimental_option("excludeSwitches", ["enable-automation"])
+        opts.add_experimental_option('useAutomationExtension', False)
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=opts)
+
+        driver.get('http://www.32x8.com/var5.html')
+
+        submitButton = WebDriverWait(driver, 15).until(lambda x: x.find_element(By.XPATH, SUBMIT))
+
+        for i in range(32):
+            if F0[i] == '1':
+                button = f"/html/body/form/table/tbody/tr[{i+3}]/td[8]/input"
+                driver.find_element(By.XPATH, button).click()
+            elif F0[i] == 'x':
+                button = f"/html/body/form/table/tbody/tr[{i+3}]/td[9]/input"
+                driver.find_element(By.XPATH, button).click()
+
+        submitButton.click()
+        #/html/body/div/div/div[4]/table
+        #/html/body/div[2]/div/div[2]/table/tbody/tr[4]/td[4]
+        #/html/body/div[2]/div/div[3]/table/tbody/tr[6]/td[3]
+        #/html/body/div[2]/div/div[4]/table/tbody/tr[1]/td[1]
+        l = driver.find_element(By.XPATH, '/html/body/div/div/div[4]/table/tbody/tr')
+        print(l)
+        for table in driver.find_element(By.XPATH, '/html/body/div/div/div[4]/table'):
+            data = [item.text for item in table.find_element(By.XPATH, ".//*[self::td or self::th]")]
+            print(data)
+        testPause()
+        driver.quit()
 
 
 if __name__ == '__main__':
@@ -93,5 +141,5 @@ if __name__ == '__main__':
     personalNumbers, listedLetters = [[4, 5], [4, 6], [1, 1], [5, 3], [1, 3], [3, 1], [2, 1], [3, 8]], ['Х', 'А', 'Л', 'У', 'С', 'М', 'К', 'И']
     print(f"Букви, отримані з вашого імені:\n{listedLetters}")
     print(f"Цифри, перетворені через конвертаційну таблицю з вибраних букв:\n{personalNumbers}")
-    task2_3(personalNumbers, listedLetters)
+    task2_3(personalNumbers, listedLetters, internetMode=True)
     pause()
