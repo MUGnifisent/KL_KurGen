@@ -179,6 +179,11 @@ def MultiplyAmplicants(ListAmplicants, DictLetters):
 def SimplifyingExpression(DictLetters, ListAplicants):
     Result = [set(item) for item in ListAplicants]
 
+    for item1 in Result:
+        for item2 in Result:
+            if item1.issubset(item2) and item1!=item2:
+                del Result[Result.index(item2)]
+
     for List in Result:
         TempList = set()
         MinLen = min([DictLetters[i] for i in List])
