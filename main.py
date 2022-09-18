@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
-from task1 import task1_1, task1_2, task1_3, task1_4
+from task1 import task1
+from task2 import task2
 
 
 CODES = {
@@ -109,13 +110,11 @@ def create_personal_numbers():
     return numbers, listedLetters
 
 
-if __name__ == '__main__':          #ver 0.0.10
+if __name__ == '__main__':              #ver 0.1.3
     personalNumbers, listedLetters = create_personal_numbers()
     print(f"Букви, отримані з вашого імені:\n{listedLetters}")
     print(f"Цифри, перетворені через конвертаційну таблицю з вибраних букв:\n{personalNumbers}")
-    task1_1(personalNumbers)
-    task1_2(personalNumbers)
-    task1_3(personalNumbers)
-    task1_4(listedLetters, personalNumbers)
+    task1(personalNumbers, listedLetters)
+    task2(personalNumbers, listedLetters)
     pause()
     

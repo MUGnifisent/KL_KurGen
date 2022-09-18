@@ -1,4 +1,5 @@
-from math import modf           #ver 0.0.10
+from math import modf, log10, ceil, floor          #ver 0.1.3
+from random import choice
 
 
 CONVERSION_TABLE={10: "A", 11: "B", 12: "C", 13: "D", 14: "E", 15: "F",
@@ -6,8 +7,55 @@ CONVERSION_TABLE={10: "A", 11: "B", 12: "C", 13: "D", 14: "E", 15: "F",
 "000": 0, "001": 1, "010": 2, "011": 3, "100": 4, "101": 5, "110": 6, "111": 7}
 
 
+KARNAUGH_MAP = {
+    '0': ['1', '4', '8', '2'],
+    '1': ['0', '3', '9', '5'],
+    '3': ['1', '2', '7', 'B'],
+    '2': ['3', '0', 'A', '6'],
+
+    '4': ['0', 'C', '5', '6'],
+    '5': ['1', 'D', '4', '7'],
+    '7': ['3', 'F', '5', '6'],
+    '6': ['2', 'E', '7', '4'],
+
+    'C': ['4', '8', 'E', 'D'],
+    'D': ['C', 'F', '5', '9'],
+    'F': ['7', 'B', 'D', 'E'],
+    'E': ['C', 'F', '6', 'A'],
+
+    '8': ['A', '9', '0', 'C'],
+    '9': ['8', 'B', '1', 'D'],
+    'B': ['9', 'A', '3', 'F'],
+    'A': ['E', '2', 'B', '8']
+}
+
+
+KARNAUGH_MAP_TABLE = [
+    ['0', '1', '3', '2'],
+    ['4', '5', '7', '6'],
+    ['C', 'D', 'F', 'E'],
+    ['8', '9', 'B', 'A']
+]
+
+
 def splitter():
     print("<---------->")
+
+
+def print_with_arrows(l):
+    p = ''
+    for element in l:
+        p = p + element + ' -> '
+    p = p.rstrip(' -> ')
+    print(p)
+
+
+def delete_repeating_elements_from_list(l):
+    result = [] 
+    for i in l: 
+        if i not in result: 
+            result.append(i) 
+    return result
 
 
 def letters_to_numbers(n):
@@ -301,3 +349,253 @@ def displayRaw(n, p):
     for i in range(n - 1,-1,-1):
         k = 0
         print("\n\t", p[n-1-i].sym, "\t", p[n-1-i].k, "\t\t", p[n-1-i].pro,"\t",end='')
+
+
+def print_table(matrix, posoffbit):
+    print("Перевірочна матриця (таблиця)")
+    max_space = 4
+    for row in matrix:
+        for item in row:
+            space = ""
+            for i in range(max_space-len(str(item))+1):
+                space = f"{space} "
+            print(f"{item}", end=space)
+        print("")
+    for _ in range((max_space+1)*(posoffbit-1)-1):
+        print(" ", end="")
+    bit = int(not matrix[len(matrix)-1][posoffbit-1])
+    print(f"({bit})")
+    print(f"Припустимо, що помилка сталася у біті i{posoffbit}")
+    print("")
+    
+
+def full_form_bin(number, bits):
+    l = len(number)
+    if l < bits:
+        for i in range(bits-l):
+            number = f"0{number}"
+    return number
+
+
+def log2(x):
+    return (log10(x) / log10(2))
+
+
+def is_power_of_2(n):
+	return (ceil(log2(n)) == floor(log2(n)))
+
+
+def get_control_pos(number):
+    l = []
+    for i in range(len(number)):
+        if is_power_of_2(i+1):
+            l.append(i+1)
+    return l
+
+
+def convert_to_list(number, control_pos):
+    l = []
+    j = 0
+    for i in range(0, len(control_pos)+len(number)):
+        if (i+1) in control_pos[j:]:
+            l.append(0)
+            j += 1
+        else:
+            l.append(int(number[i-j]))
+    return l.copy()
+
+
+def random_fail_bit_pos(number_len, control_pos):
+    l = []
+    for i in range(number_len):
+        if (i+1) not in control_pos:
+            l.append(i+1)
+    return choice(l)
+
+
+def calc_k1(number_bin_lst, label):
+    # Not flexible (only for 16-bit numbers)
+    outStrCalcValues = ""
+    outStrCalc = f"{label}1  = "
+    k1 = 0
+    index = 3
+    while index <= 21:
+        i = number_bin_lst[index-1]
+        k1 ^= i
+        if index != 3:
+            outStrCalcValues = f"{outStrCalcValues} ⊕ "
+            outStrCalc = f"{outStrCalc} ⊕ "
+        outStrCalcValues = f"{outStrCalcValues}{i}"
+        outStrCalc = f"{outStrCalc}i{index}"
+        index += 2
+    outStrCalc = f"{outStrCalc} = {outStrCalcValues} = {k1}"
+    return (k1, outStrCalc)
+
+
+def calc_k2(number_bin_lst, label):
+    # Not flexible (only for 16-bit numbers)
+    outStrCalcValues = ""
+    outStrCalc = f"{label}2  = "
+    k2 = 0
+    index = 3
+    change = False
+    while index <= 19:
+        i = number_bin_lst[index-1]
+        k2 ^= i
+        if index != 3:
+            outStrCalcValues = f"{outStrCalcValues} ⊕ "
+            outStrCalc = f"{outStrCalc} ⊕ "
+        outStrCalcValues = f"{outStrCalcValues}{i}"
+        outStrCalc = f"{outStrCalc}i{index}"
+        if change:
+            change = not change
+            index += 1
+        else:
+            change = not change
+            index += 3
+    outStrCalc = f"{outStrCalc} = {outStrCalcValues} = {k2}"
+    return (k2, outStrCalc)
+
+
+def calc_k4(number_bin_lst, label):
+    # Not flexible (only for 16-bit numbers)
+    outStrCalcValues = ""
+    outStrCalc = f"{label}4  = "
+    k4 = 0
+    for index in range(5, 8):
+        i = number_bin_lst[index-1]
+        k4 ^= i
+        if index != 5:
+            outStrCalcValues = f"{outStrCalcValues} ⊕ "
+            outStrCalc = f"{outStrCalc} ⊕ "
+        outStrCalcValues = f"{outStrCalcValues}{i}"
+        outStrCalc = f"{outStrCalc}i{index}"
+    for index in range(12, 16):
+        i = number_bin_lst[index-1]
+        k4 ^= i
+        outStrCalcValues = f"{outStrCalcValues} ⊕ {i}"
+        outStrCalc = f"{outStrCalc} ⊕ i{index}"
+    for index in range(20, 22):
+        i = number_bin_lst[index-1]
+        k4 ^= i
+        outStrCalcValues = f"{outStrCalcValues} ⊕ {i}"
+        outStrCalc = f"{outStrCalc} ⊕ i{index}"
+    outStrCalc = f"{outStrCalc} = {outStrCalcValues} = {k4}"
+    return (k4, outStrCalc)
+
+
+def calc_k8(number_bin_lst, label):
+    # Not flexible (only for 16-bit numbers)
+    outStrCalcValues = ""
+    outStrCalc = f"{label}8  = "
+    k8 = 0
+    for index in range(9, 16):
+        i = number_bin_lst[index-1]
+        k8 ^= i
+        if index != 9:
+            outStrCalcValues = f"{outStrCalcValues} ⊕ "
+            outStrCalc = f"{outStrCalc} ⊕ "
+        outStrCalcValues = f"{outStrCalcValues}{i}"
+        outStrCalc = f"{outStrCalc}i{index}"
+    outStrCalc = f"{outStrCalc} = {outStrCalcValues} = {k8}"
+    return (k8, outStrCalc)
+
+
+def calc_k16(number_bin_lst, label):
+    # Not flexible (only for 16-bit numbers)
+    outStrCalckValues = ""
+    outStrCalc = f"{label}16 = "
+    k16 = 0
+    for index in range(17, 22):
+        i = number_bin_lst[index-1]
+        k16 ^= i
+        if index != 17:
+            outStrCalckValues = f"{outStrCalckValues} ⊕ "
+            outStrCalc = f"{outStrCalc} ⊕ "
+        outStrCalckValues = f"{outStrCalckValues}{i}"
+        outStrCalc = f"{outStrCalc}i{index}"
+    outStrCalc = f"{outStrCalc} = {outStrCalckValues} = {k16}"
+    return (k16, outStrCalc)       
+
+
+class Graph:
+        
+    def __init__(self, graph = {}):
+        self.__graph = graph
+    
+    def edges(self):
+        return [(node, neighbor) 
+                 for node in self.__graph 
+                 for neighbor in self.__graph[node]]
+    
+    def nodes(self):
+        return list(self.__graph.keys())
+
+    def isolated_nodes(self):
+        return [node for node in self.__graph if not self.__graph[node]]
+    
+    def add_node(self, node):
+        if node not in self.__graph:
+            self.__graph[node] = []
+
+    def add_edge(self, node1, node2):
+        if node1 not in self.__graph:
+            self.add_node(node1)
+        if node2 not in self.__graph:
+            self.add_node(node2)
+
+        self.__graph[node1].append(node2)
+        self.__graph[node2].append(node1)
+
+    # Let's begin with the method that returns all the paths 
+    # between two nodes.    
+    # The optional path parameter is set to an empty list, so that
+    # we start with an empty path by default. 
+    def all_paths(self, node1, node2, path = []):
+        # We add node1 to the path.
+        path = path + [node1]
+        
+        # If node1 is not in the graph, the function returns an empty list.
+        if node1 not in self.__graph:
+            return []
+
+        # If node1 and node2 are one and the same node, we can return 
+        # the path now.
+        if node1 == node2:
+            return [path]
+
+        # Let's create an empty list that will store the paths.
+        paths = []
+
+        # Now we'll take each node adjacent to node1 and recursively 
+        # call the all_paths method for them to find all the paths
+        # from the adjacent node to node2.
+        # The adjacent nodes are the ones in the value lists in 
+        # the graph dictionary.        
+        for node in self.__graph[node1]:
+            if node not in path:
+
+                subpaths = self.all_paths(node, node2, path)
+
+                for subpath in subpaths:
+                    paths.append(subpath)
+
+        return paths
+
+    # And now the other method that returns the shortest path.
+    # We'll just use the method that finds all the paths and then
+    # select the one with the minimum number of nodes.
+    # If there are more than one path with the minimum number of nodes,
+    # the first one will be returned.
+    def shortest_path(self, node1, node2):
+        return sorted(self.all_paths(node1, node2), key = len)[0]
+
+
+    def all_shortest_paths(self, node1, node2):
+        n = self.all_paths(node1, node2)
+        maxlen = len(self.shortest_path(node1, node2))
+        i = []
+        for j in range(len(n)):
+            if maxlen == len(n[j]):
+                i.append(n[j])
+        return i
