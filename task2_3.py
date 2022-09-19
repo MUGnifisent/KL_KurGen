@@ -100,7 +100,7 @@ def task2_3(pn, ll, internetMode = False):
         from selenium.webdriver.chrome.service import Service
         from selenium.webdriver.chrome.options import Options
         from selenium.webdriver.support.wait import WebDriverWait
-        from selenium.webdriver.resmon.by import By
+        from selenium.webdriver.common.by import By
 
         from webdriver_manager.chrome import ChromeDriverManager
 
