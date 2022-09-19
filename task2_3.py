@@ -54,6 +54,9 @@ KARNAUGH_MAP_2X = {
 }
 
 
+LETTERS = ['E', 'D', 'C', 'B', 'A']
+
+
 def generate_starting_tables(pn):
     tt, f = [], []
     for letter in range(4):
@@ -97,7 +100,7 @@ def task2_3(pn, ll, internetMode = False):
         from selenium.webdriver.chrome.service import Service
         from selenium.webdriver.chrome.options import Options
         from selenium.webdriver.support.wait import WebDriverWait
-        from selenium.webdriver.common.by import By
+        from selenium.webdriver.resmon.by import By
 
         from webdriver_manager.chrome import ChromeDriverManager
 
@@ -105,11 +108,16 @@ def task2_3(pn, ll, internetMode = False):
 
         from bs4 import BeautifulSoup
 
+        import animation
+
 
         SUBMIT = '/html/body/form/table/tbody/tr[1]/th[1]/input'
         ASCII_opt = '/html/body/form/table/tbody/tr[7]/td[11]/input'
         TBODY = '/html/body/div/div/div[4]/table/tbody'
 
+        anim = ('.  ', '.. ', '...', '.. ')
+        wait = animation.Wait(anim, text='Calculating')
+        wait.start()
 
         opts = Options()
         #opts.add_argument("--start-maximized")
@@ -119,7 +127,7 @@ def task2_3(pn, ll, internetMode = False):
         opts.add_experimental_option('useAutomationExtension', False)
         driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=opts)
 
-        driver.get('http://www.32x8.com/var5.html')
+        driver.get('http://www.32x8.res/var5.html')
 
         submitButton = WebDriverWait(driver, 15).until(lambda x: x.find_element(By.XPATH, SUBMIT))
         driver.find_element(By.XPATH, ASCII_opt).click()
@@ -144,7 +152,7 @@ def task2_3(pn, ll, internetMode = False):
 
         soup = BeautifulSoup(table, 'lxml')
         #print(soup.prettify())
-        com = []
+        res = []
         #table0 = soup.find("table", {'class': 'wikitable sortable'})
         for row in soup.find_all("tr"):
             #col = row.find_all("td")
@@ -164,25 +172,28 @@ def task2_3(pn, ll, internetMode = False):
                         except:
                             to_append=d
                         temp.append(to_append)
-            com.append(temp)
-        #print(*com, sep='\n')
+            res.append(temp)
+        #print(*res, sep='\n')
 
-        for i in range(len(com)):
+        for i in range(len(res)):
             temp = []
-            for element in com[i][1]:
+            for element in res[i][1]:
                 checkval = str(element)
                 if 'text-decoration: overline;' in checkval:
                     temp.append(f"/{element.contents[0]}")
                 else:
                     temp.append(f"{element.contents[0]}")
-            com[i][1] = temp
-        print(*com, sep='\n')
+            res[i][1] = temp
+
+        wait.stop()
+
+        print(*res, sep='\n')
 
 
 
 if __name__ == '__main__':
-    #personalNumbers, listedLetters = create_personal_numbers()
-    personalNumbers, listedLetters = [[4, 5], [4, 6], [1, 1], [5, 3], [1, 3], [3, 1], [2, 1], [3, 8]], ['Х', 'А', 'Л', 'У', 'С', 'М', 'К', 'И']
+    personalNumbers, listedLetters = create_personal_numbers()
+    #personalNumbers, listedLetters = [[4, 5], [4, 6], [1, 1], [5, 3], [1, 3], [3, 1], [2, 1], [3, 8]], ['Х', 'А', 'Л', 'У', 'С', 'М', 'К', 'И']
     print(f"Букви, отримані з вашого імені:\n{listedLetters}")
     print(f"Цифри, перетворені через конвертаційну таблицю з вибраних букв:\n{personalNumbers}")
     task2_3(personalNumbers, listedLetters, internetMode=True)
