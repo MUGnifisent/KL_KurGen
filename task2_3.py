@@ -1,3 +1,4 @@
+from re import ASCII
 from tabulate import tabulate
 
 from main import create_personal_numbers, pause
@@ -89,30 +90,38 @@ def task2_3(pn, ll, internetMode = False):
     print(tabulatedTable)
 
     if internetMode == False:
-        #k = Graph(KARNAUGH_MAP_2X)
-        pass
+        print('UNDER DEVELOPMENT...')
+
     else:
         from selenium import webdriver
         from selenium.webdriver.chrome.service import Service
         from selenium.webdriver.chrome.options import Options
-        from webdriver_manager.chrome import ChromeDriverManager
-
         from selenium.webdriver.support.wait import WebDriverWait
         from selenium.webdriver.common.by import By
 
+        from webdriver_manager.chrome import ChromeDriverManager
+
+        #import pandas as pd
+
+        from bs4 import BeautifulSoup
+
 
         SUBMIT = '/html/body/form/table/tbody/tr[1]/th[1]/input'
+        ASCII_opt = '/html/body/form/table/tbody/tr[7]/td[11]/input'
+        TBODY = '/html/body/div/div/div[4]/table/tbody'
 
 
         opts = Options()
         opts.add_argument("--start-maximized")
         opts.add_experimental_option("excludeSwitches", ["enable-automation"])
+        opts.add_experimental_option('excludeSwitches', ['enable-logging'])
         opts.add_experimental_option('useAutomationExtension', False)
         driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=opts)
 
         driver.get('http://www.32x8.com/var5.html')
 
         submitButton = WebDriverWait(driver, 15).until(lambda x: x.find_element(By.XPATH, SUBMIT))
+        driver.find_element(By.XPATH, ASCII_opt).click()
 
         for i in range(32):
             if F0[i] == '1':
@@ -121,19 +130,53 @@ def task2_3(pn, ll, internetMode = False):
             elif F0[i] == 'x':
                 button = f"/html/body/form/table/tbody/tr[{i+3}]/td[9]/input"
                 driver.find_element(By.XPATH, button).click()
-
         submitButton.click()
-        #/html/body/div/div/div[4]/table
-        #/html/body/div[2]/div/div[2]/table/tbody/tr[4]/td[4]
-        #/html/body/div[2]/div/div[3]/table/tbody/tr[6]/td[3]
-        #/html/body/div[2]/div/div[4]/table/tbody/tr[1]/td[1]
-        l = driver.find_element(By.XPATH, '/html/body/div/div/div[4]/table/tbody/tr')
-        print(l)
-        for table in driver.find_element(By.XPATH, '/html/body/div/div/div[4]/table'):
-            data = [item.text for item in table.find_element(By.XPATH, ".//*[self::td or self::th]")]
-            print(data)
-        testPause()
+
+        table = driver.find_element(By.XPATH, TBODY).get_attribute("outerHTML")
+        #bodyHtml = driver.execute_script("return document.body.innerHTML;")
+
         driver.quit()
+        
+        #tables = pd.read_html(bodyHtml)
+        #print(tables[5])
+        ##div[2]/div/div[4]
+
+        soup = BeautifulSoup(table, 'lxml')
+        #print(soup.prettify())
+        com = []
+        #table0 = soup.find("table", {'class': 'wikitable sortable'})
+        for row in soup.find_all("tr")[1:]:
+            #col = row.find_all("td")
+            temp = []
+            for col in row.find_all("td"):
+                if len(col) > 0:
+                    spans = col.find_all("span")
+                    if len(spans) > 1:
+                        listSpan = []
+                        for span in spans:
+                            listSpan.append(span)
+                        temp.append(listSpan)
+                    else:
+                        d = col.contents[0]
+                        try:
+                            to_append=d.contents[0]
+                        except Exception as e:
+                            to_append=d
+                        temp.append(to_append)
+            com.append(temp)
+        #print(*com, sep='\n')
+
+        for i in range(len(com)):
+            temp = []
+            for element in com[i][1]:
+                checkval = str(element)
+                if 'text-decoration: overline;' in checkval:
+                    temp.append(f"/{element.contents[0]}")
+                else:
+                    temp.append(f"{element.contents[0]}")
+            com[i][1] = temp
+        #print(*com, sep='\n')
+
 
 
 if __name__ == '__main__':
