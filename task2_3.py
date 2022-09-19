@@ -112,7 +112,8 @@ def task2_3(pn, ll, internetMode = False):
 
 
         opts = Options()
-        opts.add_argument("--start-maximized")
+        #opts.add_argument("--start-maximized")
+        opts.add_argument('headless')
         opts.add_experimental_option("excludeSwitches", ["enable-automation"])
         opts.add_experimental_option('excludeSwitches', ['enable-logging'])
         opts.add_experimental_option('useAutomationExtension', False)
