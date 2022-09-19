@@ -134,7 +134,7 @@ def task2_3(pn, ll, internetMode = False):
 
         table = driver.find_element(By.XPATH, TBODY).get_attribute("outerHTML")
         #bodyHtml = driver.execute_script("return document.body.innerHTML;")
-
+        #testPause()
         driver.quit()
         
         #tables = pd.read_html(bodyHtml)
@@ -145,7 +145,7 @@ def task2_3(pn, ll, internetMode = False):
         #print(soup.prettify())
         com = []
         #table0 = soup.find("table", {'class': 'wikitable sortable'})
-        for row in soup.find_all("tr")[1:]:
+        for row in soup.find_all("tr"):
             #col = row.find_all("td")
             temp = []
             for col in row.find_all("td"):
@@ -160,7 +160,7 @@ def task2_3(pn, ll, internetMode = False):
                         d = col.contents[0]
                         try:
                             to_append=d.contents[0]
-                        except Exception as e:
+                        except:
                             to_append=d
                         temp.append(to_append)
             com.append(temp)
@@ -175,7 +175,7 @@ def task2_3(pn, ll, internetMode = False):
                 else:
                     temp.append(f"{element.contents[0]}")
             com[i][1] = temp
-        #print(*com, sep='\n')
+        print(*com, sep='\n')
 
 
 
