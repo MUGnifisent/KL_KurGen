@@ -205,5 +205,8 @@ def SimplifyingExpression(DictLetters, ListAplicants):
         else:
             ListAmlicants.append(i)
     CopyList = list(ListAmlicants)
-    ListResult = MultiplyAmplicants(CopyList, DictLetters)
+    if len(CopyList) > 1:
+        ListResult = MultiplyAmplicants(CopyList, DictLetters)
+    else:
+        ListResult = [set([i]) for i in CopyList[0]]
     return ListOneAplicant, ListAmlicants, ListResult
