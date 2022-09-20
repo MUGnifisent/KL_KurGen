@@ -1,7 +1,8 @@
 from collections import OrderedDict
-
+from docx import Document
 from task1 import task1
 from task2 import task2
+from utils.docx_utils import title_page
 
 
 CODES = {
@@ -94,7 +95,8 @@ def remove_duplicated_letters(str):
 
 
 def create_personal_numbers():
-    joinedLetters = remove_duplicated_letters(input("Введіть ваше прізвище, ім'я та побатькові: ").upper().replace(" ", ""))
+    PIB = input("Введіть ваше прізвище, ім'я та побатькові: ")
+    joinedLetters = remove_duplicated_letters(PIB.upper().replace(" ", ""))
     listedLetters = [x for x in joinedLetters]
     while len(listedLetters) != 8:
         del listedLetters[-1]
@@ -107,14 +109,17 @@ def create_personal_numbers():
             pause()
             exit()
 
-    return numbers, listedLetters
+    return numbers, listedLetters, PIB
 
 
 if __name__ == '__main__':              #ver 0.1.3
-    personalNumbers, listedLetters = create_personal_numbers()
+    document = Document()
+    personalNumbers, listedLetters, PIB = create_personal_numbers()
+    title_page(document, PIB)
     print(f"Букви, отримані з вашого імені:\n{listedLetters}")
     print(f"Цифри, перетворені через конвертаційну таблицю з вибраних букв:\n{personalNumbers}")
     task1(personalNumbers, listedLetters)
     task2(personalNumbers, listedLetters)
+    document.save('output/' + PIB + ".docx")
     pause()
     
