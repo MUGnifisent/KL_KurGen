@@ -76,20 +76,21 @@ def task1_3(pn, document):
     B = [0,0,0,0,0,0,0]
     sum = 0
     document_output = []
+    document_output.append("Число: " + str(number))
     for i in range(7):
         document_output.append("p" + chr(int("832" + str(i+1))) + " = " + str(p[i]))
-        print(document_output[i])
+        print(document_output[i+1])
 
     document_output.append("P = p₁ * p₂ * p₃ * p₄ * p₅ * p₆ * p₇ = " + str(P))
-    print(document_output[7])
+    print(document_output[8])
 
     for i in range(7):
         numberMod.append(number % p[i])
         document_output.append(str(number) + " mod " + str(p[i]) + " = " + str(numberMod[i]))
-        print(document_output[8+i])
+        print(document_output[9+i])
 
     
-    j = 15
+    j = 16
     for i in range(7):
         x = 1
         while True:
@@ -112,6 +113,8 @@ def task1_3(pn, document):
 
     for i in range(len(document_output)):
         document.add_paragraph(document_output[i])
+
+    document.add_page_break()
 
 
 
