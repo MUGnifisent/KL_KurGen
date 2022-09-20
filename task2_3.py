@@ -1,4 +1,3 @@
-from re import ASCII
 from tabulate import tabulate
 
 from main import create_personal_numbers, pause
@@ -8,6 +7,31 @@ from utils.task2_utils import *
 
 def testPause():
     program_pause = input("Press the <ENTER> key to continue...")
+
+
+IMP_CHECKER = {
+    '-0': '0',
+    '0-': '0',
+    '1-': '1',
+    '-1': '1',
+    '10': 'x',
+    '01': 'x',
+    '00': '0',
+    '11': '1',
+    '--': '-'
+}
+
+
+LETTERS = ['e', 'd', 'c', 'b', 'a'] #going into main.py
+
+
+LETTER_VARIANT = {
+    'A': LETTERS[0],
+    'B': LETTERS[1],
+    'C': LETTERS[2],
+    'D': LETTERS[3],
+    'E': LETTERS[4]
+}
 
 
 KARNAUGH_MAP_2X = {
@@ -54,8 +78,31 @@ KARNAUGH_MAP_2X = {
 }
 
 
-LETTERS = ['E', 'D', 'C', 'B', 'A']
+def table_implicants(implicants):
+    prep = []
+    for i in range(len(implicants)):
+            prep.append([f'i{i}' ,implicants[i]])
+    tabeledImplicants = tabulate(prep, tablefmt="grid", headers=['Номер\nімпліканти',''.join(LETTERS)], stralign='center')
+    return tabeledImplicants
 
+
+#def table_compared_implicants(implicants, res, resT, term):
+#    prep = []
+#    for i in range(len(implicants)):
+#            prep.append([f"i{i}", implicants[i]])
+#    prep.append(['Результат', res])
+#    prep.append(['Результат', resT])
+#    prep.append(['Терм', term])
+#    tabeledImplicants = tabulate(prep, tablefmt="grid", headers=['Порівнюються',''], stralign='center', numalign='center')
+#    return tabeledImplicants
+
+
+def table_results(res):
+    prep = []
+    for i in range(len(res)):
+        prep.append([f"i{res[i][0]} i{res[i][1]}", f"{res[i][2]}({res[i][3]})", res[i][4]])
+    table = tabulate(prep, tablefmt="grid", headers=['Порівнюються', 'Результат', 'Терм'], stralign='center', numalign='center')
+    return table
 
 def generate_starting_tables(pn):
     tt, f = [], []
@@ -79,16 +126,26 @@ def generate_starting_tables(pn):
         temp = bin(i).lstrip("0b").zfill(5)
         tt.append([hex(i)[2:].upper(),temp, f[i]])
 
-
     return tt, f
 
+def create_implicant(letters):
+    result = '-----'
+    for i in range(len(letters)):
+        l = letters[i].lstrip('/')
+        if letters[i] != l:
+            result = result[:LETTERS.index(l)] + '0' + result[LETTERS.index(l)+1:]
+        else:
+            result = result[:LETTERS.index(l)] + '1' + result[LETTERS.index(l)+1:]
+    return result
 
 def task2_3(pn, ll, internetMode = False):
     print('\n\n2.3')
 
     TRUTH_TABLE, F0 = generate_starting_tables(pn)
+    F0Only1 = set([hex(i)[2:].upper() for i in range(len(F0)) if F0[i] == '1'])
+    F0OnlyX = set([hex(i)[2:].upper() for i in range(len(F0)) if F0[i] == 'x'])
     tableHeaders = ['№', 'edcba', 'f']
-    tabulatedTable = tabulate(TRUTH_TABLE, tablefmt="grid", headers=tableHeaders)
+    tabulatedTable = tabulate(TRUTH_TABLE, tablefmt="grid", headers=tableHeaders, numalign='center', stralign='center')
 
     print(tabulatedTable)
 
@@ -115,9 +172,8 @@ def task2_3(pn, ll, internetMode = False):
         ASCII_opt = '/html/body/form/table/tbody/tr[7]/td[11]/input'
         TBODY = '/html/body/div/div/div[4]/table/tbody'
 
-        anim = ('.  ', '.. ', '...', '.. ')
+        anim = ('   ', '.  ', '.. ', '...', '.. ', '.  ')
         wait = animation.Wait(anim, text='Calculating')
-        wait.start()
 
         opts = Options()
         #opts.add_argument("--start-maximized")
@@ -127,7 +183,9 @@ def task2_3(pn, ll, internetMode = False):
         opts.add_experimental_option('useAutomationExtension', False)
         driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=opts)
 
-        driver.get('http://www.32x8.res/var5.html')
+        wait.start()
+
+        driver.get('http://www.32x8.com/var5.html')
 
         submitButton = WebDriverWait(driver, 15).until(lambda x: x.find_element(By.XPATH, SUBMIT))
         driver.find_element(By.XPATH, ASCII_opt).click()
@@ -174,21 +232,103 @@ def task2_3(pn, ll, internetMode = False):
                         temp.append(to_append)
             res.append(temp)
         #print(*res, sep='\n')
-
         for i in range(len(res)):
+            res[i][0] = list(map(lambda x: hex(int(x))[2:].upper(), res[i][0].strip('()').split(',')))
+            
             temp = []
             for element in res[i][1]:
                 checkval = str(element)
                 if 'text-decoration: overline;' in checkval:
-                    temp.append(f"/{element.contents[0]}")
+                    temp.append(f"/{LETTER_VARIANT[element.contents[0]]}")
                 else:
-                    temp.append(f"{element.contents[0]}")
+                    temp.append(f"{LETTER_VARIANT[element.contents[0]]}")
             res[i][1] = temp
 
         wait.stop()
 
-        print(*res, sep='\n')
+        listTermXIn = set()
+        listTermXOut = set(F0OnlyX)
+        repeationDict = {}
+        for i, NumAndLet in enumerate(res):
+            number, letter = NumAndLet
+            for num in number:
+                repeationDict[num] = repeationDict.get(num, 0)  + 1
+            SetNumber = set(number)
+            print(f'{i+1}) Склеювання клітинок: {" ".join(number)}; результат: {"".join(letter)};')
+            MinTerms = sorted(F0Only1.intersection(SetNumber), key= lambda x: int(x, 16))
+            print(f'Мінімізуються набори: {" ".join(MinTerms)}')
+            listTermXIn.update(F0OnlyX.intersection(SetNumber))
+            listTermXOut.difference_update(SetNumber)
+        listTermXIn = sorted(listTermXIn, key= lambda x: int(x, 16))
+        listTermXOut = sorted(listTermXOut, key= lambda x: int(x, 16))
+        print(f'Невизначені значення функції в клітинках {" ".join(listTermXIn)} довизначаємо як "1", оскільки вони беруть участь у склеюванні за "1".')
+        print(f'Невизначені значення функції в клітинках {" ".join(listTermXOut)} довизначаємо як "0", оскільки вони не беруть участь у склеюванні за "1".')
+        #print(F0Only1)
+        for i in range(max(repeationDict.values())):
+            TermsRepeatI = []
+            for key, values in repeationDict.items():
+                if values == i+1:
+                    TermsRepeatI.append(key)
+            TermsRepeatI = sorted(TermsRepeatI, key= lambda x: int(x, 16))
+            if i == 0:
+                print(f'Набори {" ".join(TermsRepeatI)} беруть участь у {i+1} склеюванні.')
+            else:
+                print(f'Набори {" ".join(TermsRepeatI)} беруть участь у {i+1} склеюваннях.')
+        #print(*res, sep='\n')
 
+        implicants = [create_implicant(let[1]) for let in res]
+        #for i in range(len(res)):
+        #    implicants.append(['-', '-', '-', '-', '-'])
+        #    for element in res[i][1]:
+        #        if '/' in element:
+        #            temp = element.lstrip('/')
+        #            implicants[i][ord(temp) - 97] = '0'
+        #        else:
+        #            implicants[i][ord(element) - 97] = '1'
+        
+        print(table_implicants(implicants))
+
+        checker, idealChecker = [], []
+        for i in range(len(implicants)):
+            temp, idealTemp = '', ''
+            for j in range(len(implicants)):
+                idealTemp += '+'
+                if i == j:
+                    temp += '+'
+                else:
+                    temp += '-'
+            checker.append(list(temp))
+            idealChecker.append(list(idealTemp))
+
+        impRes = []
+        while True:
+            if checker == idealChecker:
+                break
+
+            for i in range(len(implicants)):
+                for j in range(len(implicants)):
+                    if checker[i][j] == '+' and checker[j][i] == '+':
+                        continue
+                    lilImpRes = ''
+                    for n in range(len(implicants[0])):
+                        temp = implicants[i][n] + implicants[j][n]
+                        lilImpRes += IMP_CHECKER[temp]
+
+                    lilImpResTr = lilImpRes.replace('x', '-')
+
+                    lilTerm = ''
+                    for n in range(len(lilImpResTr)):
+                        if lilImpResTr[n] == '0':
+                            lilTerm += f"/{LETTERS[n]}"
+                        elif lilImpResTr[n] == '1':
+                            lilTerm += f"{LETTERS[n]}"
+
+                    #print(table_compared_implicants([implicants[i], implicants[j]], lilImpRes, lilImpResTr, lilTerm))
+                    
+                    impRes.append([i, j, lilImpRes, lilImpResTr, lilTerm])
+
+                    checker[i][j], checker[j][i] = '+', '+'
+        print(table_results(impRes))
 
 
 if __name__ == '__main__':
@@ -197,4 +337,4 @@ if __name__ == '__main__':
     print(f"Букви, отримані з вашого імені:\n{listedLetters}")
     print(f"Цифри, перетворені через конвертаційну таблицю з вибраних букв:\n{personalNumbers}")
     task2_3(personalNumbers, listedLetters, internetMode=True)
-    pause()
+    #pause()
