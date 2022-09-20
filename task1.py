@@ -67,7 +67,7 @@ def task1_2(pn):
 
 
 
-def task1_3(pn):
+def task1_3(pn, document):
     print("\n\n1.3")
     number = int(f"{pn[0][0]}{pn[0][1]}{pn[1][0]}{pn[1][1]}{pn[7][0]}{pn[7][1]}")
     p = [2,3,5,7,11,13,17]
@@ -75,21 +75,28 @@ def task1_3(pn):
     numberMod = []
     B = [0,0,0,0,0,0,0]
     sum = 0
+    document_output = []
     for i in range(7):
-        print("p" + str(i+1) + " = " + str(p[i]))
+        document_output.append("p" + chr(int("832" + str(i+1))) + " = " + str(p[i]))
+        print(document_output[i])
 
-    print("P = p1 * p2 * p3 * p4 * p5 * p6 * p7 = " + str(P))
+    document_output.append("P = p₁ * p₂ * p₃ * p₄ * p₅ * p₆ * p₇ = " + str(P))
+    print(document_output[7])
 
     for i in range(7):
         numberMod.append(number % p[i])
-        print(str(number) + " mod " + str(p[i]) + " = " + str(numberMod[i]))
+        document_output.append(str(number) + " mod " + str(p[i]) + " = " + str(numberMod[i]))
+        print(document_output[8+i])
 
-
+    
+    j = 15
     for i in range(7):
         x = 1
         while True:
             B[i] = int(x * (P/p[i]))
-            print("B" + str(i+1) + " = " + str(x) + " * " + str(P) + "/" + str(p[i]) + " = " + str(B[i]) + " [" + str(int(B[i] % p[i])) + "]")
+            document_output.append("B" + chr(int("832" + str(i+1))) + " = " + str(x) + " * " + str(P) + " : " + str(p[i]) + " = " + str(B[i]) + " (" + str(int(B[i] % p[i])) + ")")
+            print(document_output[j])
+            j+=1
             x+=1
             if B[i] % p[i] == 1:
                 break
@@ -97,8 +104,17 @@ def task1_3(pn):
     for i in range(7):
         sum += numberMod[i] * B[i]
 
-    print("( " + str(numberMod[0]) + " * " + str(B[0]) + " + " + str(numberMod[1]) + " * " + str(B[1]) + " + " + str(numberMod[2]) + " * " + str(B[2]) + " + " + str(numberMod[3]) + " * " + str(B[3])
+    document_output.append("( " + str(numberMod[0]) + " * " + str(B[0]) + " + " + str(numberMod[1]) + " * " + str(B[1]) + " + " + str(numberMod[2]) + " * " + str(B[2]) + " + " + str(numberMod[3]) + " * " + str(B[3])
     + " + " + str(numberMod[4]) + " * " + str(B[4]) + " + " + str(numberMod[5]) + " * " + str(B[5]) + " + " + str(numberMod[6]) + " * " + str(B[6]) + ") = " + str(sum) + " mod " + str(P) + " = " + str(sum % P))
+    print(document_output[len(document_output)-1])
+
+    document.add_paragraph("1.3 Скласти шестизначне число, яке складається з отриманих за допомогою кодової таблиці кодів 1-ої, 2-ої та 8-ої літер прізвища. Вважаючи це число десятковим, перевести його до системи числення залишкових класів із мінімально необхідною кількістю основ 2, 3, 5, 7, 11, ... . Після цього зробити зворотне переведення отриманого результату до десяткової системи числення.\n")
+
+    for i in range(len(document_output)):
+        document.add_paragraph(document_output[i])
+
+
+
 
 
 def task1_4(listedLetters, pn):
@@ -340,10 +356,10 @@ def task1_6(pn, ll):
             print("Помилкових кодів немає.")
 
 
-def task1(personalNumbers, listedLetters):
+def task1(personalNumbers, listedLetters, document):
     task1_1(personalNumbers)
     task1_2(personalNumbers)
-    task1_3(personalNumbers)
+    task1_3(personalNumbers, document)
     task1_4(listedLetters, personalNumbers)
     task1_5(listedLetters, personalNumbers)
     task1_6(personalNumbers, listedLetters)

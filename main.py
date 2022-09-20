@@ -118,7 +118,7 @@ if __name__ == '__main__':              #ver 0.1.3
     title_page(document, PIB)
     print(f"Букви, отримані з вашого імені:\n{listedLetters}")
     print(f"Цифри, перетворені через конвертаційну таблицю з вибраних букв:\n{personalNumbers}")
-    task1(personalNumbers, listedLetters)
+    task1(personalNumbers, listedLetters, document)
     task2(personalNumbers, listedLetters)
     document.save('output/' + PIB + ".docx")
     pause()
