@@ -6,46 +6,71 @@ from tabulate import tabulate
 from utils.task1_utils import *
 
 
-def task1_1(pn):
+def task1_1(pn, listedLetters, document):
+    document_output = []
+    document_output.append("""1.1 Скласти шестизначне число, яке складається з отриманих за допомогою кодової таблиці кодів 1-ої, 2-ої та 8-ої літер прізвища. При цьому перші 3 цифри відповідають цілій частині числа, а останні - дробовій.
+    Вважаючи це число десятковим, перевести його до шістнадцяткової, з шістнадцяткової до двійкової, з двійкової до вісімкової систем числення з точністю відповідно 3, 5 та 3 розрядів після коми.""")
     print("\n\n1.1")
+    document_output.append(f"{listedLetters[0]} - {pn[0][0]}{pn[0][1]}, {listedLetters[1]} - {pn[1][0]}{pn[1][1]}, {listedLetters[7]} - {pn[7][0]}{pn[7][1]}")
     splitter()
     number = float(f"{pn[0][0]}{pn[0][1]}{pn[1][0]}.{pn[1][1]}{pn[7][0]}{pn[7][1]}") # for output
+    document_output.append(f"Число: {number}₁₀")
     numberBD = int(f"{pn[0][0]}{pn[0][1]}{pn[1][0]}") # before dot
     numberAD = int(f"{pn[1][1]}{pn[7][0]}{pn[7][1]}") # after dot
     print(f"Десяткове число, трансформоване з персональних кодів - {number}")
     splitter()
-
-    print("Проведемо перетворення з десяткового числа до шіснадцяткового.")
-    numberBD = decimal_to_hexadecimal_bd(numberBD) 
+    document_output.append("Переведення з десяткового числа до шіснадцяткового:")
+    print("Переведення з десяткового числа до шіснадцяткового:")
+    numberBD, co = decimal_to_hexadecimal_bd(numberBD)
+    document_output += co
     print(f"Число до коми дорівнює {numberBD}")
-    numberAD = decimal_to_hexadecimal_ad(numberAD)
+    numberAD, co = decimal_to_hexadecimal_ad(numberAD)
+    document_output += co
     print(f"Число після коми дорівнює {numberAD}")
+    document_output.append(f"{number}₁₀ = {numberBD}.{numberAD}₁₆")
     number = str(f"{numberBD}.{numberAD}")
+    prevnumber = number
     print(f"З'єднане число дорівнює {number}")
     splitter()
-
+    document_output.append("Переведення з шіснадцяткового числа до двійкового:")
     print("Проведемо перетворення з шіснадцяткового числа до двійкового.")
-    numberBD, numberAD, number = hexadecimal_to_binary(numberBD, numberAD)
+    numberBD, numberAD, number, co = hexadecimal_to_binary(numberBD, numberAD)
+    document_output += co
+    document_output.append(f"{prevnumber}₁₆ = {number}₂")
+    prevnumber = number
     print(f"Після очищення від непотрібних нулів та скорочення, число дорівнює {number}")
     splitter()
-
+    document_output.append("Переведення з двійкового числа до вісімкового:")
     print("Проведемо перетворення з двійкового числа до вісімкового.")
-    number, numberBD, numberAD = binary_to_octo(numberBD, numberAD)
+    number, numberBD, numberAD, co = binary_to_octo(numberBD, numberAD)
+    document_output += co
+    document_output.append(f"{prevnumber}₂ = {number}₈")
     print(f"Після форматування, число дорівнює {number}")
     splitter()
+    for i in range(len(document_output)):
+        document.add_paragraph(document_output[i])
+    document.add_page_break()
     
 
-def task1_2(pn):
+def task1_2(pn, listedLetters, document):
+    document_output = []
+    document_output.append("""1.2 Скласти шестизначне число, яке складається з отриманих за допомогою кодової таблиці кодів 1-ої, 2-ої та 8-ої літер прізвища. При цьому перші 3 цифри відповідають цілій частині числа, а останні - дробовій.
+    Вважаючи це число шістнадцятковим, перевести його до десяткової, з шістнадцяткової до двійкової, з двійкової до вісімкової систем числення з точністю відповідно 3, 5 та 3 розрядів після коми.""")
     print("\n\n1.2")
     splitter()
+    document_output.append(f"{listedLetters[0]} - {pn[0][0]}{pn[0][1]}, {listedLetters[1]} - {pn[1][0]}{pn[1][1]}, {listedLetters[7]} - {pn[7][0]}{pn[7][1]}")
     number = f"{pn[0][0]}{pn[0][1]}{pn[1][0]}.{pn[1][1]}{pn[7][0]}{pn[7][1]}"
     numberBD = f"{pn[0][0]}{pn[0][1]}{pn[1][0]}"
     numberAD = f"{pn[1][1]}{pn[7][0]}{pn[7][1]}"
+    document_output.append(f"Число: {number}₁₆")
+    prevnumber = number
     print(f"Шіснадцяткове число, трансформоване з персональних кодів - {number}")
     splitter()
-
+    document_output.append("Переведення з шіснадцяткового числа до десяткового:")
     print("Проведемо перетворення з шіснадцяткового числа до десяткового.")
-    number, numberBD, numberAD = hexadecimal_to_decimal(numberBD, numberAD)
+    number, numberBD, numberAD, co = hexadecimal_to_decimal(numberBD, numberAD)
+    document_output += co
+    document_output.append(f"{prevnumber}₁₆ = {number}₁₀")
     print(f"Число до коми дорівнює {numberBD}")
     print(f"Після проведеного округлення, число після коми дорівнює {numberAD}")
     print(f"З'єднане число дорівнює {number}")
@@ -54,16 +79,26 @@ def task1_2(pn):
     number = str(f"{pn[0][0]}{pn[0][1]}{pn[1][0]}.{pn[1][1]}{pn[7][0]}{pn[7][1]}")
     numberBD = str(f"{pn[0][0]}{pn[0][1]}{pn[1][0]}")
     numberAD = str(f"{pn[1][1]}{pn[7][0]}{pn[7][1]}")
-
+    prevnumber = number
+    document_output.append("Переведення з шіснадцяткового числа до двійкового:")
     print("Проведемо перетворення з шіснадцяткового числа до двійкового.")
-    numberBD, numberAD, number = hexadecimal_to_binary(numberBD, numberAD)
+    numberBD, numberAD, number, co = hexadecimal_to_binary(numberBD, numberAD)
+    document_output += co
+    document_output.append(f"{prevnumber}₁₆ = {number}₂")
     print(f"Після очищення від непотрібних нулів та скорочення, число дорівнює {number}")
     splitter()
 
+    document_output.append("Переведення з двійкового числа до вісімкового:")
+    prevnumber = number
     print("Проведемо перетворення з двійкового числа до вісімкового.")
-    number, numberBD, numberAD = binary_to_octo(numberBD, numberAD)
+    number, numberBD, numberAD, co = binary_to_octo(numberBD, numberAD)
+    document_output += co
+    document_output.append(f"{prevnumber}₂ = {number}₈")
     print(f"Після форматування, число дорівнює {number}")
     splitter()
+    for i in range(len(document_output)):
+        document.add_paragraph(document_output[i])
+    document.add_page_break()
 
 
 
@@ -360,8 +395,8 @@ def task1_6(pn, ll):
 
 
 def task1(personalNumbers, listedLetters, document):
-    task1_1(personalNumbers)
-    task1_2(personalNumbers)
+    task1_1(personalNumbers, listedLetters, document)
+    task1_2(personalNumbers, listedLetters, document)
     task1_3(personalNumbers, document)
     task1_4(listedLetters, personalNumbers)
     task1_5(listedLetters, personalNumbers)

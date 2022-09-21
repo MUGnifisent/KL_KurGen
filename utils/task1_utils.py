@@ -1,4 +1,4 @@
-from math import modf, log10, ceil, floor          #ver 0.1.3
+from math import modf, log10, ceil, floor, trunc          #ver 0.1.3
 from random import choice
 
 
@@ -88,33 +88,41 @@ def letters_to_numbers(n):
 def decimal_to_binary(d):
     dec = d
     c=""
+    convertion_output = []
     while dec > 0 :
         a = dec % 2
         print(f"{dec} / 2 = {dec / 2}[{dec % 2}]")
+        convertion_output.append(f"{dec} / 2 = {dec / 2}({dec % 2})")
         c += str(int(a))
         dec //= 2
     c = c[::-1]
     print(f"Результат перед трансформацією в чотиризначне число - {c}")
-    return c
+    return c, convertion_output
 
 def decimal_to_hexadecimal_bd(d):
     dec = d
     c=""
+    convertion_output = []
     while dec > 0 :
         a = dec % 16
         print(f"{dec} / 16 = {dec / 16}[{dec % 16}]")
         if a <= 15 and a > 9 :
             c += str(CONVERSION_TABLE[a])
             print(f"Оскільки остача дорівнює {dec % 16}, ми заміняємо її на літеру {CONVERSION_TABLE[a]}")
+            convertion_output.append(f"{dec} / 16 = {trunc(dec / 16)} ({CONVERSION_TABLE[a]})")
         else :
             c += str(int(a))
+            convertion_output.append(f"{dec} / 16 = {trunc(dec / 16)} ({dec % 16})")
+        
         dec //= 16
-    return c[::-1]
+    convertion_output.append("")
+    return c[::-1], convertion_output
 
 
 def decimal_to_hexadecimal_ad(d):
     dec = float(f"0.{d}")
     c = ""
+    convertion_output = []
     for i in range(3):
         frac, whole = modf(dec * 16)
         whole = int(whole)
@@ -124,15 +132,18 @@ def decimal_to_hexadecimal_ad(d):
         if a <= 15 and a > 9 :
             c += str(CONVERSION_TABLE[a])
             print(f"Оскільки ціла частина дорівнює {whole}, ми заміняємо її на літеру {CONVERSION_TABLE[a]}")
+            convertion_output.append(f"{dec} * 16 = {whole}{str(frac).lstrip('0')} ({CONVERSION_TABLE[a]})")
         else :
+            convertion_output.append(f"{dec} * 16 = {whole}{str(frac).lstrip('0')} ({whole})")
             c += str(int(a))
         dec = frac
-    return c
+    return c, convertion_output
 
 
 def hexadecimal_to_binary(bd, ad):
     a = [x for x in bd]
     b = [x for x in ad]
+    convertion_output = []
     print("Переведемо букви в обох частинах числа в цифри.")
     print("Перед комою: ")
     a = letters_to_numbers(a)
@@ -146,13 +157,19 @@ def hexadecimal_to_binary(bd, ad):
     print("Переведемо кожну цифру шістнадцяткового числа у чотирьохзначне двійкове, та з'єднаємо їх.")
     print("***")
     for number in a:
-        cbd += decimal_to_binary(int(number)).zfill(4)
+        temp, co = decimal_to_binary(int(number))
+        cbd += temp.zfill(4)
+        convertion_output += co
+        convertion_output.append("")
         print("---")
     print(f"Тобто, з'єднане та трансформоване число перед комою дорівнює {cbd}")
     print("***")
     cad = ""
     for number in b:
-        cad += decimal_to_binary(int(number)).zfill(4)
+        temp, co = decimal_to_binary(int(number))
+        cad += temp.zfill(4)
+        convertion_output += co
+        convertion_output.append("")
         print("---")
     print(f"Тобто, з'єднане та трансформоване число після коми дорівнює {cad}")
 
@@ -160,7 +177,7 @@ def hexadecimal_to_binary(bd, ad):
     while len(cad) > 5:
         cad = cad[:-1]
     c = cbd + "." + cad
-    return(cbd, cad, c)
+    return(cbd, cad, c, convertion_output)
 
 
 def binary_to_octo(bd, ad):
@@ -168,6 +185,7 @@ def binary_to_octo(bd, ad):
     b = ad
     cbd = ""
     cad = ""
+    convertion_output = []
     print("Задля можливості використовувати метод трійок, додамо (при потребі) деяку кількість нулів на початку числа перед комою, і в кінці числа після коми.")
     while len(a) % 3 != 0:
         a = "0" + a
@@ -182,13 +200,16 @@ def binary_to_octo(bd, ad):
     for i in range(int(len(a) / 3)):
         cbd = cbd + str(CONVERSION_TABLE[a[index] + a[index + 1] + a[index + 2]])
         print(f"{a[index] + a[index + 1] + a[index + 2]} = {CONVERSION_TABLE[a[index] + a[index + 1] + a[index + 2]]}")
+        convertion_output.append(f"{a[index] + a[index + 1] + a[index + 2]}₂ = {CONVERSION_TABLE[a[index] + a[index + 1] + a[index + 2]]}₈")
         index = index + 3
     print(f"Тобто, з'єднане число перед комою дорівнює {cbd}")
     print("***")
     index = 0
+    convertion_output.append("")
     for i in range(int(len(b) / 3)):
         cad = cad + str(CONVERSION_TABLE[b[index] + b[index + 1] + b[index + 2]])
         print(f"{b[index] + b[index + 1] + b[index + 2]} = {CONVERSION_TABLE[b[index] + b[index + 1] + b[index + 2]]}")
+        convertion_output.append(f"{b[index] + b[index + 1] + b[index + 2]}₂ = {CONVERSION_TABLE[b[index] + b[index + 1] + b[index + 2]]}₈")
         index = index + 3
     print(f"Тобто, з'єднане число після коми дорівнює {cad}")
 
@@ -199,13 +220,13 @@ def binary_to_octo(bd, ad):
         elif len(cad) < 3:
             cad = cad + "0"
     c = cbd + "." + cad
-    return c, cbd, cad
+    return c, cbd, cad, convertion_output
 
 
 def hexadecimal_to_decimal(bd, ad):
     a = [x for x in bd]
     b = [x for x in ad]
-
+    convertion_output = []
     print("Переведемо букви в обох частинах числа в цифри.")
     print("Перед комою: ")
     a = letters_to_numbers(a)
@@ -223,21 +244,27 @@ def hexadecimal_to_decimal(bd, ad):
 
     print("***")
     cbd, cad = 0, 0
-    output1BD, output1AD = "A = ", "B = "
+
+    powerSymbols = ["⁰", "¹", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹"]
+
+    output1BD, output1AD = "", ""
     output2BD, output2AD = "", ""
     for i in range(len(a)):
-        output1BD = output1BD + f"{int(a[i])} * 16^{i} + "
+        output1BD = output1BD + f"{int(a[i])} * 16{powerSymbols[i]} + "
         output2BD = output2BD + f"{int(a[i]) * (16 ** i)} + "
         cbd = cbd + int(a[i]) * (16 ** i)
     output1 = output1BD.rstrip("+ ") + " = " + output2BD.rstrip("+ ") + f" = {cbd}"
     print(output1)
+    convertion_output.append(output1)
+    convertion_output.append("")
     print("---")
     for i in range(len(b)):
-            output1AD = output1AD + f"{int(b[i])} * 16^(-{i + 1}) + "
+            output1AD = output1AD + f"{int(b[i])} * 16⁻{powerSymbols[i+1]} + "
             output2AD = output2AD + f"{int(b[i]) * (16 ** -(i + 1))} + "
             cad = cad + int(b[i]) * (16 ** -(i + 1))
-    output2 = output1AD.rstrip("+ ") + " = " + output2AD.rstrip("+ ") + f" = {cad}"
+    output2 = output1AD.rstrip("+ ") + " = " + output2AD.rstrip("+ ") + f" = {round(cad, 3)}"
     print(output2)
+    convertion_output.append(output2)
     cbd = str(cbd)
     cad = str(cad)[2:]
     cbd = cbd.lstrip("0")
@@ -247,7 +274,7 @@ def hexadecimal_to_decimal(bd, ad):
         elif len(cad) < 3:
             cad = cad + "0"
     c = cbd + "." + cad
-    return c, cbd, cad
+    return c, cbd, cad, convertion_output
 
 
 class  node :
