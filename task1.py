@@ -1,7 +1,7 @@
 from math import log                #ver 0.1.3
 from itertools import chain
 
-from docx import Cm
+from docx.shared import Cm
 from tabulate import tabulate
 
 from utils.task1_utils import *
@@ -329,13 +329,15 @@ def task1_5(ll, pn, document):
     rows, cols = len(checkMatrix), len(checkMatrix[0])
     document.add_paragraph("Перевірочна матриця (таблиця)")
     table = document.add_table(rows=rows, cols=cols, style="Table Grid")
-    table.autofit = True
+    # Setting fixed cell width
+    table.autofit = False
 
     rowN = 0
     for row in checkMatrix:
         colN = 0
         for item in row:
             table.rows[rowN].cells[colN].text = str(item)
+            table.rows[rowN].cells[colN].width = Cm(1.25)
             colN += 1
         rowN += 1
         
