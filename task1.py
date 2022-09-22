@@ -1,6 +1,7 @@
 from math import log                #ver 0.1.3
 from itertools import chain
 
+from docx import Cm
 from tabulate import tabulate
 
 from utils.task1_utils import *
@@ -245,7 +246,8 @@ def task1_4(listedLetters, pn):
     print(notEffectiveOutput + "  " + str(len(notEffectiveOutput) - notEffectiveOutput.count(' ')) + "біт")
 
 
-def task1_5(ll, pn):
+def task1_5(ll, pn, document):
+    document.add_paragraph("1.5 Для шістнадцяти розрядного двійкового коду (1ц1л)(2ц1л)(1ц8л)(2ц8л) сформувати код Геммінга (Hamming) і продемонструвати його реакцію на однократний збій. Результати подати у вигляді таблиці.")
     print("\n\n1.5")
     splitter()
     
@@ -253,7 +255,9 @@ def task1_5(ll, pn):
     numberBin = bin(int(numberHex, 16))[2:]
     numberBin = full_form_bin(numberBin, 16)
     
-    print(f"{ll[0]}: {numberHex[0:2]}; {ll[7]}: {numberHex[2:4]}; {numberHex}={numberBin}\n")
+    outStrYourNumbers = f"{ll[0]}: {numberHex[0:2]}; {ll[7]}: {numberHex[2:4]}; {numberHex}={numberBin}\n"
+    document.add_paragraph(outStrYourNumbers)
+    print(outStrYourNumbers)
     
     controlPositions = get_control_pos(numberBin)
     numberBinLst = convert_to_list(numberBin, controlPositions)
@@ -322,21 +326,61 @@ def task1_5(ll, pn):
     outStrCalcFailBitPos = "K ⊕ k = (K16 ⊕ k16)(K8 ⊕ k8)(K4 ⊕ k4)(K2 ⊕ k2)(K1 ⊕ k1) = " \
         f"({k16_} ⊕ {k16})({k8_} ⊕ {k8})({k4_} ⊕ {k4})({k2_} ⊕ {k2})({k1_} ⊕ {k1}) = {posOfFailBit_}"
 
+    rows, cols = len(checkMatrix), len(checkMatrix[0])
+    document.add_paragraph("Перевірочна матриця (таблиця)")
+    table = document.add_table(rows=rows, cols=cols, style="Table Grid")
+    table.autofit = True
+
+    rowN = 0
+    for row in checkMatrix:
+        colN = 0
+        for item in row:
+            table.rows[rowN].cells[colN].text = str(item)
+            colN += 1
+        rowN += 1
+        
+
+    
+    tableFailBit = document.add_table(rows=1, cols=cols)
+    failBit = int(not checkMatrix[rows-1][posOfFailBit-1])
+    tableFailBit.rows[0].cells[posOfFailBit-1].text = f"({failBit})"
+
+    document.add_paragraph(f"Припустимо, що помилка сталася у біті i{posOfFailBit}.")
+    document.add_paragraph()
+
     print_table(checkMatrix, posOfFailBit)
+
+    print(checkMatrix) # test
+
+    document.add_paragraph(outStrCalck1)
     print(outStrCalck1)
+    document.add_paragraph(outStrCalck2)
     print(outStrCalck2)
+    document.add_paragraph(outStrCalck4)
     print(outStrCalck4)
+    document.add_paragraph(outStrCalck8)
     print(outStrCalck8)
+    document.add_paragraph(outStrCalck16)
     print(outStrCalck16)
+    document.add_paragraph()
     print("")
+    document.add_paragraph(outStrCalcK1)
     print(outStrCalcK1)
+    document.add_paragraph(outStrCalcK2)
     print(outStrCalcK2)
+    document.add_paragraph(outStrCalcK4)
     print(outStrCalcK4)
+    document.add_paragraph(outStrCalcK8)
     print(outStrCalcK8)
+    document.add_paragraph(outStrCalcK16)
     print(outStrCalcK16)
+    document.add_paragraph()
     print("")
+    document.add_paragraph(outStrCalcFailBitPos)
     print(outStrCalcFailBitPos)
-    print(f"Значення {posOfFailBit_} вказує на те, що помилка сталася в {int(posOfFailBit_, 2)} біті ({posOfFailBit_}={int(posOfFailBit_, 2)}).")  
+    outStrResult = f"Значення {posOfFailBit_} вказує на те, що помилка сталася в {int(posOfFailBit_, 2)} біті ({posOfFailBit_}={int(posOfFailBit_, 2)})."
+    document.add_paragraph(outStrResult)
+    print(outStrResult)  
 
 
 def task1_6(pn, ll):
@@ -399,5 +443,5 @@ def task1(personalNumbers, listedLetters, document):
     task1_2(personalNumbers, listedLetters, document)
     task1_3(personalNumbers, document)
     task1_4(listedLetters, personalNumbers)
-    task1_5(listedLetters, personalNumbers)
+    task1_5(listedLetters, personalNumbers, document)
     task1_6(personalNumbers, listedLetters)
