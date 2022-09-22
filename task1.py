@@ -1,7 +1,7 @@
 from math import log                #ver 0.1.3
 from itertools import chain
 
-from docx.shared import Cm
+from docx.shared import Cm, Pt
 from tabulate import tabulate
 
 from utils.task1_utils import *
@@ -329,23 +329,36 @@ def task1_5(ll, pn, document):
     rows, cols = len(checkMatrix), len(checkMatrix[0])
     document.add_paragraph("Перевірочна матриця (таблиця)")
     table = document.add_table(rows=rows, cols=cols, style="Table Grid")
-    # Setting fixed cell width
     table.autofit = False
-
     rowN = 0
     for row in checkMatrix:
         colN = 0
         for item in row:
-            table.rows[rowN].cells[colN].text = str(item)
-            table.rows[rowN].cells[colN].width = Cm(1.25)
+            cell = table.rows[rowN].cells[colN]
+            cell.text = str(item)
+            cell.width = Cm(0.95)
+            paragraphs = cell.paragraphs
+            for paragraph in paragraphs:
+                for run in paragraph.runs:
+                    font = run.font
+                    font.size= Pt(11)
             colN += 1
         rowN += 1
-        
 
-    
+
     tableFailBit = document.add_table(rows=1, cols=cols)
     failBit = int(not checkMatrix[rows-1][posOfFailBit-1])
     tableFailBit.rows[0].cells[posOfFailBit-1].text = f"({failBit})"
+    # Setting cell width and font size
+    tableFailBit.autofit = False
+    for row in tableFailBit.rows:
+        for cell in row.cells:
+            cell.width = Cm(0.95)
+            paragraphs = cell.paragraphs
+            for paragraph in paragraphs:
+                for run in paragraph.runs:
+                    font = run.font
+                    font.size= Pt(11)
 
     document.add_paragraph(f"Припустимо, що помилка сталася у біті i{posOfFailBit}.")
     document.add_paragraph()

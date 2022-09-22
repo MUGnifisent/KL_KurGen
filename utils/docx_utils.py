@@ -6,13 +6,13 @@ from docx.shared import Pt
 def title_page(document, PIB):
     style = document.styles['Normal']
     font = style.font
-    font.name = 'Arial'
-    font.size = Pt(13)
+    font.name = 'Times New Roman'
+    font.size = Pt(12)
     document.add_paragraph('Міністерство освіти і науки України').alignment = WD_ALIGN_PARAGRAPH.CENTER
     document.add_paragraph('Національний університет "Львівська Політехніка"').alignment = WD_ALIGN_PARAGRAPH.CENTER
     document.add_paragraph('Кафедра ЕОМ').alignment = WD_ALIGN_PARAGRAPH.CENTER
     document.add_paragraph('\n\n\n\n\n\n\nЗвіт').alignment = WD_ALIGN_PARAGRAPH.CENTER
-    document.add_paragraph('з курсової роботи').alignment = WD_ALIGN_PARAGRAPH.CENTER
+    document.add_paragraph('до курсової роботи').alignment = WD_ALIGN_PARAGRAPH.CENTER
     document.add_paragraph('з дисципліни "Комп\'ютерна логіка"').alignment = WD_ALIGN_PARAGRAPH.CENTER
     document.add_paragraph('\n\n\n\n\n\nВиконав:').alignment = WD_ALIGN_PARAGRAPH.RIGHT
     document.add_paragraph('ст. групи КІ-210').alignment = WD_ALIGN_PARAGRAPH.RIGHT
@@ -20,4 +20,5 @@ def title_page(document, PIB):
     document.add_paragraph('Прийняв:').alignment = WD_ALIGN_PARAGRAPH.RIGHT
     document.add_paragraph('доцент каф. ЕОМ').alignment = WD_ALIGN_PARAGRAPH.RIGHT
     document.add_paragraph('Голембо В. А.').alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    document.add_paragraph('\n\n\nЛьвів ' + str(date.today().year)).alignment = WD_ALIGN_PARAGRAPH.CENTER
+    document.add_paragraph('\n\n\n\n\n\n\n\n\nЛьвів ' + str(date.today().year)).alignment = WD_ALIGN_PARAGRAPH.CENTER
+    document.add_page_break()

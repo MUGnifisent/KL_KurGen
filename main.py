@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from docx import Document
+from docx.shared import Cm
 from task1 import task1
 from task2 import task2
 from utils.docx_utils import title_page
@@ -114,6 +115,14 @@ def create_personal_numbers():
 
 if __name__ == '__main__':              #ver 0.1.3
     document = Document()
+    # Changing the page margins
+    margin = 1
+    sections = document.sections
+    for section in sections:
+        section.top_margin = Cm(margin)
+        section.bottom_margin = Cm(margin)
+        section.left_margin = Cm(margin)
+        section.right_margin = Cm(margin)
     personalNumbers, listedLetters, PIB = create_personal_numbers()
     title_page(document, PIB)
     print(f"Букви, отримані з вашого імені:\n{listedLetters}")
