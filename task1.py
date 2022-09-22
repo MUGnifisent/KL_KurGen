@@ -341,7 +341,7 @@ def task1_5(ll, pn, document):
             for paragraph in paragraphs:
                 for run in paragraph.runs:
                     font = run.font
-                    font.size= Pt(11)
+                    font.size= Pt(10)
             colN += 1
         rowN += 1
 
@@ -358,7 +358,7 @@ def task1_5(ll, pn, document):
             for paragraph in paragraphs:
                 for run in paragraph.runs:
                     font = run.font
-                    font.size= Pt(11)
+                    font.size= Pt(10)
 
     document.add_paragraph(f"Припустимо, що помилка сталася у біті i{posOfFailBit}.")
     document.add_paragraph()
