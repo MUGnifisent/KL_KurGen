@@ -1,12 +1,63 @@
+
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
+from lxml import etree
+import latex2mathml.converter
+
 def CreateTableOfBinNum(LstOfBinNum, pn):       #ver 0.1.3
+    print_array = [[], [], [], [], []]
     for i in range(8):
         for j in range(2):
+            print_array[0].append(pn[i][j])
             print(pn[i][j], end='   ')
     print()
+    index = 1
     for i in range(4):
         for j in range(16):
+            print_array[index].append(LstOfBinNum[j][i])
             print(LstOfBinNum[j][i], end='   ')
         print()
+        index+=1
+    return print_array
+
+def set_cell_border(cell, **kwargs):
+    """
+    Set cell`s border
+    Usage:
+
+    set_cell_border(
+        cell,
+        top={"sz": 12, "val": "single", "color": "#FF0000", "space": "0"},
+        bottom={"sz": 12, "color": "#00FF00", "val": "single"},
+        start={"sz": 24, "val": "dashed", "shadow": "true"},
+        end={"sz": 12, "val": "dashed"},
+    )
+    """
+    tc = cell._tc
+    tcPr = tc.get_or_add_tcPr()
+
+    # check for tag existnace, if none found, then create one
+    tcBorders = tcPr.first_child_found_in("w:tcBorders")
+    if tcBorders is None:
+        tcBorders = OxmlElement('w:tcBorders')
+        tcPr.append(tcBorders)
+
+    # list over all available tags
+    for edge in ('start', 'top', 'end', 'bottom', 'insideH', 'insideV'):
+        edge_data = kwargs.get(edge)
+        if edge_data:
+            tag = 'w:{}'.format(edge)
+
+            # check for tag existnace, if none found, then create one
+            element = tcBorders.find(qn(tag))
+            if element is None:
+                element = OxmlElement(tag)
+                tcBorders.append(element)
+
+            # looks like order of attributes is important
+            for key in ["sz", "val", "color", "space", "shadow"]:
+                if key in edge_data:
+                    element.set(qn('w:{}'.format(key)), str(edge_data[key]))
 
 def FindPosXInF(LstOfBinNum):
     if LstOfBinNum[0][0] == '1':
@@ -32,12 +83,15 @@ def FindPosXInF(LstOfBinNum):
     return StartPosXInF0, StartPosXInF1, StartPosXInF2, StartPosXInF3, StartPosXInF4
 
 def FillFOfX(StartPosXInF, LstOfBinNum, letter, index):
+    print_text = ""
     if index == StartPosXInF:
              print(f'({LstOfBinNum[letter][index%4]})x',end='\t')
+             print_text = f'({LstOfBinNum[letter][index%4]})x'
              StartPosXInF += 3
     else:
         print(LstOfBinNum[letter][index%4], end='\t')
-    return StartPosXInF
+        print_text = LstOfBinNum[letter][index%4]
+    return StartPosXInF, print_text
 
 def MergerBinNum(bin1, bin2):
     count = 0
@@ -48,7 +102,7 @@ def MergerBinNum(bin1, bin2):
             index = i 
         if count == 2:
             return -1
-    return bin1[:index] + '_' + bin1[index + 1:]
+    return bin1[:index] + '-' + bin1[index + 1:]
     
 def SortInDictBy1(ListOfNum, abc):
     SortDict = {}
@@ -63,8 +117,16 @@ def ConvertDictToList(SortDict):
     List = []
     for key in SortDict.keys():
         for index in range(len(SortDict[key])):
-            List.append([SortDict[key][index], f'{key}{index}', '-'])
+            List.append([SortDict[key][index], f'{key}{conver_to_lower_symbol(index)}', '-'])
     return List
+
+def conver_to_lower_symbol(number):
+    lowerSymbols = ["₀", "₁", "₂", "₃", "₄", "₅", "₆", "₇", "₈", "₉"]
+    number_digits = [int(x) for x in str(number)]
+    convertedNumber = ""
+    for i in range(len(number_digits)):
+        convertedNumber += lowerSymbols[number_digits[i]]
+    return convertedNumber
 
 def CreateListOfMerges(SortDictF0):
     LstMerges = []
@@ -77,23 +139,49 @@ def CreateListOfMerges(SortDictF0):
                 for item2 in range(len(SortDictF0[scndkey])):
                     tempMerge = MergerBinNum(SortDictF0[key][item1], SortDictF0[scndkey][item2])
                     if tempMerge != -1:
-                        if [SortDictF0[key][item1], f'{key}{item1}','-'] in List1:
-                            List1[List1.index([SortDictF0[key][item1], f'{key}{item1}', '-'])][2] = '+'
-                        if [SortDictF0[scndkey][item2], f'{scndkey}{item2}','-'] in List1:
-                            List1[List1.index([SortDictF0[scndkey][item2], f'{scndkey}{item2}','-'])][2] = '+'
+                        if [SortDictF0[key][item1], f'{key}{conver_to_lower_symbol(item1)}','-'] in List1:
+                            List1[List1.index([SortDictF0[key][item1], f'{key}{conver_to_lower_symbol(item1)}', '-'])][2] = '+'
+                        if [SortDictF0[scndkey][item2], f'{scndkey}{conver_to_lower_symbol(item2)}','-'] in List1:
+                            List1[List1.index([SortDictF0[scndkey][item2], f'{scndkey}{conver_to_lower_symbol(item2)}','-'])][2] = '+'
                         LstMerges.append(tempMerge)
-                        LstNameMerges.append([f'{key}{item1}{scndkey}{item2}'])
+                        LstNameMerges.append([f'{key}{conver_to_lower_symbol(item1)}{scndkey}{conver_to_lower_symbol(item2)}'])
     return LstMerges, List1, LstNameMerges
 
 def CheckEqualityNums(num1, num2):
     for i in range(len(num2)):
-        if num2[i] =='_':
-            num1 = num1[:i] + '_' + num1[i + 1:]
+        if num2[i] =='-':
+            num1 = num1[:i] + '-' + num1[i + 1:]
     if num1 == num2:
         return True
     else:
         return False
-    
+
+def latex_to_word(latex_input):
+    mathml = latex2mathml.converter.convert(latex_input)
+    tree = etree.fromstring(mathml)
+    xslt = etree.parse(
+        'MML2OMML.XSL'
+        )
+    transform = etree.XSLT(xslt)
+    new_dom = transform(tree)
+    return new_dom.getroot()
+
+def BinaryToLettersWithSpecialSymbols(Bin):
+    #List0 = ['ā','b̅','c̄','đ','ē']
+    #List0 = ['ā','b̅', 'c̄','d̅','ē']
+    letters = '' 
+    #List0 = ['ā','ᵬ','c̄','đ','ē']
+    #List0 = ['ā','ᵬ','ꞇ','đ','ē']
+    List0 = ['\\bar{e}', '\\bar{d}', '\\bar{c}', '\\bar{b}', '\\bar{a}']
+    List1 = ['e', 'd', 'c', 'b', 'a']
+    for i in range(len(Bin)):
+        if Bin[i] != '-':
+            if Bin[i] == '1':
+                letters += List1[i]
+            else:
+                letters += List0[i]
+    return latex_to_word(letters)
+
 def BinaryToLetters(Bin):
     #List0 = ['ā','b̅','c̄','đ','ē']
     #List0 = ['ā','b̅', 'c̄','d̅','ē']
@@ -103,7 +191,7 @@ def BinaryToLetters(Bin):
     List0 = ['ē', 'đ', 'č', 'ƀ', 'ā']
     List1 = ['e', 'd', 'c', 'b', 'a']
     for i in range(len(Bin)):
-        if Bin[i] != '_':
+        if Bin[i] != '-':
             if Bin[i] == '1':
                 letters += List1[i]
             else:
@@ -111,13 +199,23 @@ def BinaryToLetters(Bin):
     return letters
 
 def PrintFunctionAmplicants(ListsWithAplicant, v, x):
+    output = ""
     for item in ListsWithAplicant:
         if len(item) > 1:
+            temp = f'({v.join([i for i in item])})'
+            for i in range(len(temp)):
+                if temp[i].isdigit():
+                    output += conver_to_lower_symbol(temp[i])
+                else:
+                    output += temp[i]
             print(f'({v.join([i for i in item])})', end='')
         else:
+            output += item[0] + ' '
             print(item[0], end=' ')
         if ListsWithAplicant.index(item) != len(ListsWithAplicant) - 1:
+            output += x
             print(x,end='')
+    return output
 
 def DelIdenticalInList(l):
     n = []

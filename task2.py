@@ -1,5 +1,8 @@
 from utils.task2_utils import *                 #ver 0.1.3
-
+from docx.shared import Cm, Pt
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.table import WD_ALIGN_VERTICAL
+from docx.enum.table import WD_ROW_HEIGHT_RULE
 
 def task2_1(pn):
     print("\n\n2.1")
@@ -331,9 +334,12 @@ def task2_1(pn):
         print(" тому дана функція утворює ФПС.")
 
 
-def task2_2(personalNumbers, listedLetters):
+def task2_2(personalNumbers, listedLetters, document):
     print('\n\n2.2')
-
+    document.add_paragraph("""2.2 Мінімізувати за допомогою методу Квасна-Мак-Класкі-Петрика 5 функцій (f0, f1, f2, f3, f4) 5-ти змінних (a, b, c, d, e). Функції задано за допомогою таблиці ТZ.3. Побудувати таблицю, яка ілюструє процес знаходження простих імплікант,і таблицю покриття (імплікантну таблицю). За допомогою методу Петрика визначити всі мінімальні розв'язки. Кожний третій набір для кожної з функцій має невизначене значення. Відлік починається від першого згори одиничного значення функції з врахуванням зміщення, величина якого позначена у табл. ТZ.3:
+    S - відлік починається безпосередньо від першого згори одиничного значення;
+    -S - відлік починається від попереднього набору відносно першого згори одиничного значення;
+    +S - відлік починається від наступного набору відносно першого згори одиничного значення.""")
     pn = personalNumbers
 
     LstOfBinNum = []
@@ -343,11 +349,80 @@ def task2_2(personalNumbers, listedLetters):
         Num2Bin = bin(pn[i][1])[2:]
         LstOfBinNum.append(Num2Bin.zfill(4))
 
+    firstTable = document.add_table(rows=6, cols=16, style="Table Grid")
+    firstTable.autofit = False
+
+    mergeindex = 0
+
+    for i in range(8):
+        a = firstTable.cell(0, mergeindex)
+        mergeindex+=1
+        b = firstTable.cell(0, mergeindex)
+        mergeindex+=1
+        a.merge(b)
+        cell = firstTable.rows[0].cells[mergeindex-1]
+        cell.text = str(listedLetters[i])
+        paragraphs = cell.paragraphs
+        for paragraph in paragraphs:
+            for run in paragraph.runs:
+                font = run.font
+                font.size= Pt(11)
+
     print(' ', end=' ')
     print(*listedLetters, sep=' '*7)
-    CreateTableOfBinNum(LstOfBinNum, pn)
+    pa = CreateTableOfBinNum(LstOfBinNum, pn)
+    print(pa)
+    for i in range(len(pa)):
+        for j in range(len(pa[0])):
+            cell = firstTable.rows[i+1].cells[j]
+            cell.text = str(pa[i][j])
+            paragraphs = cell.paragraphs
+            for paragraph in paragraphs:
+                for run in paragraph.runs:
+                    font = run.font
+                    font.size= Pt(11)
 
     print('\n\n')
+    document.add_paragraph("")
+    secondTable = document.add_table(rows=34, cols=11, style="Table Grid")
+    secondTable.autofit = False
+    for i in range(34):
+        for j in range(11):
+            cell = secondTable.rows[i].cells[j]
+            if j == 0:
+                cell.width = Cm(0.8)
+            elif j > 0 and j < 6:
+                cell.width = Cm(0.7)
+            elif j > 5:
+                cell.width = Cm(1.1)
+
+    a = secondTable.cell(0, 0)
+    b = secondTable.cell(0, 5)
+    a.merge(b)
+    secondTable.rows[0].cells[0].text = 'Зміщення першого невизначеного значення'
+    secondTable.rows[0].cells[6].text = '-S'
+    secondTable.rows[0].cells[7].text = 'S'
+    secondTable.rows[0].cells[8].text = '+S'
+    secondTable.rows[0].cells[9].text = '-S'
+    secondTable.rows[0].cells[10].text = 'S'
+    secondTable.rows[1].cells[0].text = '№'
+    secondTable.rows[1].cells[1].text = 'e'
+    secondTable.rows[1].cells[2].text = 'd'
+    secondTable.rows[1].cells[3].text = 'c'
+    secondTable.rows[1].cells[4].text = 'b'
+    secondTable.rows[1].cells[5].text = 'a'
+    secondTable.rows[1].cells[6].text = 'f₀'
+    secondTable.rows[1].cells[7].text = 'f₁'
+    secondTable.rows[1].cells[8].text = 'f₂'
+    secondTable.rows[1].cells[9].text = 'f₃'
+    secondTable.rows[1].cells[10].text = 'f₄'
+    for i in range(5):
+        secondTable.rows[0].cells[i+6].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        secondTable.rows[0].cells[i+6].vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+    for i in range(11):
+        secondTable.rows[1].cells[i].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    secondTableData = [[] for x in range(32)]
     print('Зміщення першого\nневизначеного\t   \t-S\tS\t+S\t-S\tS\nзначення')
     print('№ набору e d c b a\tf0\tf1\tf2\tf3\tf4')
     BinNum0to31 = []
@@ -357,8 +432,10 @@ def task2_2(personalNumbers, listedLetters):
     StartPosXInF0, StartPosXInF1, StartPosXInF2, StartPosXInF3, StartPosXInF4 = FindPosXInF(LstOfBinNum)
     for i in range(32):
         print(i,end='\t ')
+        secondTableData[i].append(i)
         BinNum0to31.append(bin(i)[2:].zfill(5))
         for number in BinNum0to31[i]:
+            secondTableData[i].append(number)
             print(number, end=' ')
         
         if i%4 == 0:
@@ -366,22 +443,40 @@ def task2_2(personalNumbers, listedLetters):
         print(end='\t')
         if i == StartPosXInF0:
              NumF0.append('x')
+             secondTableData[i].append(f'({LstOfBinNum[letter][i%4]})x')
              print(f'({LstOfBinNum[letter][i%4]})x',end='\t')
              StartPosXInF0 += 3
         else:
             NumF0.append(LstOfBinNum[letter][i%4])
+            secondTableData[i].append(LstOfBinNum[letter][i%4])
             print(LstOfBinNum[letter][i%4], end='\t')
         d = letter + 8
-        StartPosXInF1 = FillFOfX(StartPosXInF1, LstOfBinNum, letter, i)
-        StartPosXInF2 = FillFOfX(StartPosXInF2, LstOfBinNum, letter, i)
-        StartPosXInF3 = FillFOfX(StartPosXInF3, LstOfBinNum, d, i)
-        StartPosXInF4 = FillFOfX(StartPosXInF4, LstOfBinNum, d, i)
-         
+        StartPosXInF1, temp = FillFOfX(StartPosXInF1, LstOfBinNum, letter, i)
+        secondTableData[i].append(temp)
+        StartPosXInF2, temp = FillFOfX(StartPosXInF2, LstOfBinNum, letter, i)
+        secondTableData[i].append(temp)
+        StartPosXInF3, temp = FillFOfX(StartPosXInF3, LstOfBinNum, d, i)
+        secondTableData[i].append(temp)
+        StartPosXInF4, temp = FillFOfX(StartPosXInF4, LstOfBinNum, d, i)
+        secondTableData[i].append(temp)
         if NumF0[i] == '1' or NumF0[i] == 'x':
             SetsForF0.append(BinNum0to31[i])
         print()
 
+    for i in range(len(secondTableData)):
+        for j in range(len(secondTableData[i])):
+            cell = secondTable.rows[i+2].cells[j]
+            cell.text = str(secondTableData[i][j])
+            paragraphs = cell.paragraphs
+            for paragraph in paragraphs:
+                paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                for run in paragraph.runs:
+                    font = run.font
+                    font.size= Pt(10)
+
+    document.add_paragraph("")
     print('\n\n')
+
     abc = 97
     SortDict = SortInDictBy1(SetsForF0, abc)
     ListMerge, list1, listname = CreateListOfMerges(SortDict)
@@ -400,13 +495,92 @@ def task2_2(personalNumbers, listedLetters):
         AllDataForTable.append(listname)
     print()
     MaxLen = len(max(AllDataForTable, key = lambda x: len(x)))
+
+    thirdTableCols = 0
+
+    print(AllDataForTable)
     for index in range(MaxLen):
         for table in AllDataForTable:
+            if index == 0 and index < len(table):
+                thirdTableCols += len(table[index])
             if index < len(table):
                 print(*table[index], sep='\t', end='\t')
             else:
                 print('\t\t', end='\t')
         print()
+
+    document.add_paragraph("")
+    thirdTable = document.add_table(rows=MaxLen+1, cols=thirdTableCols)
+    thirdTable.rows[0].cells[0].text = 'К'
+    thirdTable.rows[0].cells[1].text = 'П'
+    thirdTable.rows[0].cells[2].text = 'У'
+    thirdTableUpperLetters = 3
+    for i in range(int((thirdTableCols-3)/4)):
+        thirdTable.rows[0].cells[thirdTableUpperLetters].text = 'С'
+        thirdTableUpperLetters += 1
+        thirdTable.rows[0].cells[thirdTableUpperLetters].text = 'К'
+        thirdTableUpperLetters += 1
+        thirdTable.rows[0].cells[thirdTableUpperLetters].text = 'П'
+        thirdTableUpperLetters += 1
+        thirdTable.rows[0].cells[thirdTableUpperLetters].text = 'У'
+        thirdTableUpperLetters += 1
+
+    for i in range(thirdTableCols):
+        block = thirdTable.rows[0].cells[i]
+        paragraph = block.paragraphs[0]
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        run = paragraph.runs
+        font = run[0].font
+        font.size= Pt(10)
+        set_cell_border(
+            block,
+            top={"sz": 5, "val": "single", "color": "#000000"},
+            bottom={"sz": 5, "val": "single", "color": "#000000"},
+            start={"sz": 5, "val": "single", "color": "#000000"},
+            end={"sz": 5, "val": "single", "color": "#000000"},
+        )
+
+    row = 1
+    col = 0
+    for index in range(MaxLen):
+        for table in AllDataForTable:
+            if index < len(table):
+                for cell in table[index]:
+                    if col != thirdTableCols:
+                        block = thirdTable.rows[row].cells[col]
+                        block.text = cell
+                        paragraph = block.paragraphs[0]
+                        paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                        run = paragraph.runs
+                        font = run[0].font
+                        font.size= Pt(10)
+                        col += 1
+                        set_cell_border(
+                            block,
+                            top={"sz": 5, "val": "single", "color": "#000000"},
+                            bottom={"sz": 5, "val": "single", "color": "#000000"},
+                            start={"sz": 5, "val": "single", "color": "#000000"},
+                            end={"sz": 5, "val": "single", "color": "#000000"},
+                        )
+            else:
+                col += 3
+        col = 0
+        row += 1
+    
+    thirdTable.autofit = False
+    for i in range(MaxLen+1):
+        thirdTable.rows[i].height_rule = WD_ROW_HEIGHT_RULE.EXACTLY
+        thirdTable.rows[i].height = Pt(13)
+        for j in range(thirdTableCols):
+            cell = thirdTable.rows[i].cells[j]
+            if thirdTable.rows[0].cells[j].text == "К":
+                cell.width = Cm(1.5)
+            elif thirdTable.rows[0].cells[j].text == "П":
+                cell.width = Cm(1)
+            elif thirdTable.rows[0].cells[j].text == "У":
+                cell.width = Cm(0.7)
+            elif thirdTable.rows[0].cells[j].text == "С":
+                cell.width = Cm(1.2)
     
     print('\n\n')
     AllNegative = []
@@ -415,10 +589,12 @@ def task2_2(personalNumbers, listedLetters):
         for item in TempNegative:
             if item[0] not in AllNegative:
                 AllNegative.append(item[0])
-    
+    document.add_paragraph("")
+    document.add_paragraph("Прості імпліканти:")
+    document.add_paragraph(', '.join(AllNegative))
     print('Прості імпліканти:')
     print(*AllNegative, sep = ', ', end='.\n\n')
-    ListCountLetter = [len(x.replace('_','')) for x in AllNegative]
+    ListCountLetter = [len(x.replace('-','')) for x in AllNegative]
     LstF0Only1 = [BinNum0to31[i] for i in range(32) if NumF0[i] == '1']
     ListsWithAplicant = []
     ListOfLetters = {f'I{i+1}':BinaryToLetters(AllNegative[i]) for i in range(len(AllNegative))}
@@ -428,26 +604,63 @@ def task2_2(personalNumbers, listedLetters):
     print(*[item.ljust(5) for item in ListOfLetters.values()], sep='\t')
     print('edcba', end='\t\t')
     print(*AllNegative, sep='\t')
+    fourthTable = document.add_table(rows=len(LstF0Only1)+4, cols=len(ListOfLetters.values())+1, style="Table Grid")
+    a = fourthTable.cell(0, 0)
+    b = fourthTable.cell(1, 0)
+    a.merge(b)
+    fourthTable.rows[0].cells[0].text = "Одиничні набори"
+    fourthTable.rows[2].cells[0].text = "edcba"
+    print(str(ListCountLetter))
+    for i in range(len(ListOfLetters.keys())):
+        fourthTable.rows[0].cells[i+1].text = "I" + conver_to_lower_symbol(str(i+1))
+        p = fourthTable.rows[1].cells[i+1].add_paragraph()
+        p._element.append(BinaryToLettersWithSpecialSymbols(AllNegative[i]))
+        fourthTable.rows[2].cells[i+1].text = AllNegative[i]
+        fourthTable.rows[len(LstF0Only1)+3].cells[i+1].text = str(ListCountLetter[i])
+    row = 3
+    col = 0
     for Set in LstF0Only1:
+        col = 0
+        fourthTable.rows[row].cells[col].text = Set
+        col += 1
         print(Set, end='\t\t')
         TempList = []
         for merge in range(len(AllNegative)):
             if CheckEqualityNums(Set,AllNegative[merge]):
                 print('V', end = '\t')
                 TempList.append(f'I{merge + 1}')
+                fourthTable.rows[row].cells[col].text = "✓"
             else:
+                fourthTable.rows[row].cells[col].text = " "
                 print('-', end = '\t')
+            col += 1
         ListsWithAplicant.append(TempList)
         print('\n')
+        row += 1
+    fourthTable.rows[len(LstF0Only1)+3].cells[0].text = "Літер в імплакації"
+    for i in range(len(LstF0Only1)+4):
+        for j in range(len(ListOfLetters.values())+1):
+            block = fourthTable.rows[i].cells[j]
+            if i == 1 and j > 0:
+                print(f"i {i} j {j}")
+            else:
+                paragraph = block.paragraphs[0]
+                run = paragraph.runs
+                font = run[0].font
+                font.size= Pt(10)
+
+
     print('Літер в\nімплакації', end='\t')
     print(*ListCountLetter, sep='\t')
-
+    document.add_paragraph("")
     print('\n\n')
     DictOfCountLetters = {f'I{index + 1}':ListCountLetter[index] for index in range(len(ListCountLetter))}
+    document.add_paragraph("Отримаємо функцію F:")
     print('Отримаємо функцію F:\nF =',end=' ')
-    PrintFunctionAmplicants(ListsWithAplicant, ' v ', ' ')
+    document.add_paragraph("F = " + PrintFunctionAmplicants(ListsWithAplicant, ' v ', ' '))
+    document.add_paragraph("Спрощення:")
     print('\nСпрощення:\nF =', end = ' ')
-
+    
     ListOneAmplicant, ListAmplicants, ListResults = SimplifyingExpression(DictOfCountLetters, ListsWithAplicant)
     ListOneAmplicant = [''.join(i)  for i in ListOneAmplicant]
     for i in ListResults:
@@ -455,17 +668,56 @@ def task2_2(personalNumbers, listedLetters):
     ListOneAmplicant = sorted(ListOneAmplicant, key = lambda x: int(x[1:]))
     ListAmplicants = [sorted(list(i), key = lambda x: int(x[1:])) for i in ListAmplicants]
     ListResults = [sorted(list(i), key = lambda x: int(x[1:])) for i in ListResults]
+    ListOneAmplicantOutput = ""
+    for i in range(len(ListOneAmplicant)):
+        for j in range(len(ListOneAmplicant[i])):
+            if ListOneAmplicant[i][j].isdigit():
+                ListOneAmplicantOutput += conver_to_lower_symbol(ListOneAmplicant[i][j])
+            else:
+                ListOneAmplicantOutput += ListOneAmplicant[i][j]
+        ListOneAmplicantOutput += " "
+    
     print(*ListOneAmplicant, sep=' ', end='')
-    PrintFunctionAmplicants(ListAmplicants, ' v ', ' ')
+    ListOneAmplicantOutput += PrintFunctionAmplicants(ListAmplicants, ' v ', ' ')
+    ListOneAmplicantOutput += " = "
     print(' = ', end='')
-    PrintFunctionAmplicants(ListResults, ' ', ' v ')
+    ListOneAmplicantOutput += PrintFunctionAmplicants(ListResults, ' ', ' v ')
+    document.add_paragraph("F = " + ListOneAmplicantOutput)
+    document.add_paragraph(f'\nОтже, дана функція F має {len(ListResults)} мінімальні ДНФ:')
     print(f'\n\nОтже, дана функція F має {len(ListResults)} мінімальні ДНФ:')
+    print(ListResults)
+    print(ListOfLetters)
     for i, dnf in enumerate(ListResults, 1):
+        temp = f'{i}) F = '
+        firstPart = str(' v '.join(dnf))
+        for i in range(len(firstPart)):
+            for j in range(len(firstPart[i])):
+                if firstPart[i][j].isdigit():
+                    temp += conver_to_lower_symbol(firstPart[i][j])
+                else:
+                    temp += firstPart[i][j]
+        temp += ' = ' + str(' v '.join([ListOfLetters[item] for item in dnf])) + ";"
+        List0 = ['ē', 'đ', 'č', 'ƀ', 'ā']
+        List1 = ['e', 'd', 'c', 'b', 'a']
+        outputResult = ""
+        for z in range(len(temp)):
+            index = 0
+            for j in range(len(List0)):
+                if temp[z] == List0[j]:
+                    outputResult += "\\bar{" + List1[j] + "}"
+                    break
+                index +=1
+                print(index)
+                if index == 5:
+                    print("yes")
+                    outputResult += temp[z]
+        p = document.add_paragraph()
+        p._element.append(latex_to_word(outputResult))
         print(f'{i}) F = ', end ='')
         print(*[item.ljust(3) for item in dnf], sep=' v ', end =' = ')
         print(*[ListOfLetters[item] for item in dnf], sep=' v ', end =';\n')
 
 
-def task2(personalNumbers, listedLetters):
+def task2(personalNumbers, listedLetters, document):
     task2_1(personalNumbers)
-    task2_2(personalNumbers, listedLetters)
+    task2_2(personalNumbers, listedLetters, document)

@@ -396,6 +396,7 @@ def task1_5(ll, pn, document):
     outStrResult = f"Значення {posOfFailBit_} вказує на те, що помилка сталася в {int(posOfFailBit_, 2)} біті ({posOfFailBit_}={int(posOfFailBit_, 2)})."
     document.add_paragraph(outStrResult)
     print(outStrResult)  
+    document.add_page_break()
 
 
 def task1_6(pn, ll):
