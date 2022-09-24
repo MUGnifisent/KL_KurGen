@@ -1,9 +1,11 @@
 from collections import OrderedDict
 from docx import Document
 from docx.shared import Cm
+import docx2pdf
+
 from task1 import task1
 from task2 import task2
-from utils.docx_utils import title_page
+from utils.docx_utils import *
 
 
 CODES = {
@@ -123,12 +125,20 @@ if __name__ == '__main__':              #ver 0.1.3
         section.bottom_margin = Cm(margin)
         section.left_margin = Cm(margin)
         section.right_margin = Cm(margin)
+
     personalNumbers, listedLetters, PIB = create_personal_numbers()
+
     title_page(document, PIB)
+
+    SAVE_PATH = 'output/' + PIB + ".docx"
+
     print(f"Букви, отримані з вашого імені:\n{listedLetters}")
     print(f"Цифри, перетворені через конвертаційну таблицю з вибраних букв:\n{personalNumbers}")
     task1(personalNumbers, listedLetters, document)
     task2(personalNumbers, listedLetters, document)
-    document.save('output/' + PIB + ".docx")
+
+    document.save(SAVE_PATH)
+    docx2pdf.convert(SAVE_PATH)
+
     pause()
     
