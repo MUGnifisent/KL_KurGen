@@ -685,34 +685,36 @@ def task2_2(personalNumbers, listedLetters, document):
     document.add_paragraph("F = " + ListOneAmplicantOutput)
     document.add_paragraph(f'\nОтже, дана функція F має {len(ListResults)} мінімальні ДНФ:')
     print(f'\n\nОтже, дана функція F має {len(ListResults)} мінімальні ДНФ:')
-    print(ListResults)
-    print(ListOfLetters)
     for i, dnf in enumerate(ListResults, 1):
         temp = f'{i}) F = '
         firstPart = str(' v '.join(dnf))
-        for i in range(len(firstPart)):
-            for j in range(len(firstPart[i])):
-                if firstPart[i][j].isdigit():
-                    temp += conver_to_lower_symbol(firstPart[i][j])
+        for z in range(len(firstPart)):
+            for j in range(len(firstPart[z])):
+                if firstPart[z][j].isdigit():
+                    temp += conver_to_lower_symbol(firstPart[z][j])
                 else:
-                    temp += firstPart[i][j]
+                    temp += firstPart[z][j]
+        p = document.add_paragraph()
+        p.text = temp
+        temp = ""
         temp += ' = ' + str(' v '.join([ListOfLetters[item] for item in dnf])) + ";"
         List0 = ['ē', 'đ', 'č', 'ƀ', 'ā']
         List1 = ['e', 'd', 'c', 'b', 'a']
-        outputResult = ""
         for z in range(len(temp)):
             index = 0
             for j in range(len(List0)):
                 if temp[z] == List0[j]:
-                    outputResult += "\\bar{" + List1[j] + "}"
+                    p._element.append(latex_to_word("\\bar{" + List1[j] + "}"))
                     break
                 index +=1
-                print(index)
                 if index == 5:
-                    print("yes")
-                    outputResult += temp[z]
-        p = document.add_paragraph()
-        p._element.append(latex_to_word(outputResult))
+                    if temp[z] == " ":
+                        p._element.append(latex_to_word("\\medspace"))
+                    elif temp[z] == "v":
+                        p._element.append(latex_to_word("\\text{v}"))
+                    else:
+                        p._element.append(latex_to_word(temp[z]))
+        
         print(f'{i}) F = ', end ='')
         print(*[item.ljust(3) for item in dnf], sep=' v ', end =' = ')
         print(*[ListOfLetters[item] for item in dnf], sep=' v ', end =';\n')

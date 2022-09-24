@@ -138,7 +138,7 @@ if __name__ == '__main__':              #ver 0.1.3
     task2(personalNumbers, listedLetters, document)
 
     document.save(SAVE_PATH)
-    docx2pdf.convert(SAVE_PATH)
+    #docx2pdf.convert(SAVE_PATH)
 
     pause()
     
