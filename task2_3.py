@@ -98,7 +98,7 @@ def table_implicants(implicants):
 
 
 def table_results(res):
-    prep, lct = []
+    prep, lct = [], []
     for i in range(len(res)):
         if res[i][2].count('x') == 1:
             prep.append([f"i{res[i][0]} i{res[i][1]}", f"{res[i][2]}({res[i][3]})", f"{res[i][4]}(+)"])
