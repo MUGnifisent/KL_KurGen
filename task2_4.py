@@ -97,11 +97,15 @@ def table_implicants(implicants):
 
 
 def table_results(res):
-    prep = []
+    prep, lct = []
     for i in range(len(res)):
-        prep.append([f"i{res[i][0]} i{res[i][1]}", f"{res[i][2]}({res[i][3]})", res[i][4]])
+        if res[i][2].count('x') == 1:
+            prep.append([f"i{res[i][0]} i{res[i][1]}", f"{res[i][2]}({res[i][3]})", f"{res[i][4]}(+)"])
+            lct.append(res[i][4])
+        else:
+            prep.append([f"i{res[i][0]} i{res[i][1]}", f"{res[i][2]}({res[i][3]})", "-"])
     table = tabulate(prep, tablefmt="grid", headers=['Порівнюються', 'Результат', 'Терм'], stralign='center', numalign='center')
-    return table
+    return table, lct
 
 def generate_starting_tables(pn):
     tt, f = [], []
@@ -141,7 +145,7 @@ def task2_4(pn, ll, internetMode = False):
     print('\n\n2.3')
 
     TRUTH_TABLE, F0 = generate_starting_tables(pn)
-    F0Only1 = set([hex(i)[2:].upper() for i in range(len(F0)) if F0[i] == '1'])
+    F0Only0 = set([hex(i)[2:].upper() for i in range(len(F0)) if F0[i] == '0'])
     F0OnlyX = set([hex(i)[2:].upper() for i in range(len(F0)) if F0[i] == 'x'])
     tableHeaders = ['№', 'edcba', 'f']
     tabulatedTable = tabulate(TRUTH_TABLE, tablefmt="grid", headers=tableHeaders, numalign='center', stralign='center')
@@ -177,14 +181,14 @@ def task2_4(pn, ll, internetMode = False):
         wait = animation.Wait(anim, text='Calculating')
 
         opts = Options()
-        opts.add_argument("--start-maximized")
-        #opts.add_argument('headless')
+        #opts.add_argument("--start-maximized")
+        opts.add_argument('headless')
         opts.add_experimental_option("excludeSwitches", ["enable-automation"])
         opts.add_experimental_option('excludeSwitches', ['enable-logging'])
         opts.add_experimental_option('useAutomationExtension', False)
         driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=opts)
 
-        #wait.start()
+        wait.start()
 
         driver.get('http://www.32x8.com/var5.html')
 
@@ -200,12 +204,12 @@ def task2_4(pn, ll, internetMode = False):
             elif F0[i] == 'x':
                 button = f"/html/body/form/table/tbody/tr[{i+3}]/td[9]/input"
                 driver.find_element(By.XPATH, button).click()
-        testPause()
+        #testPause()
         submitButton.click()
 
         table = driver.find_element(By.XPATH, TBODY).get_attribute("outerHTML")
         #bodyHtml = driver.execute_script("return document.body.innerHTML;")
-        testPause()
+        #testPause()
         driver.quit()
         
         #tables = pd.read_html(bodyHtml)
@@ -222,7 +226,7 @@ def task2_4(pn, ll, internetMode = False):
             for col in row.find_all("td"):
                 if len(col) > 0:
                     spans = col.find_all("span")
-                    if len(spans) > 1:
+                    if len(spans) > 0:
                         listSpan = []
                         for span in spans:
                             listSpan.append(span)
@@ -248,7 +252,7 @@ def task2_4(pn, ll, internetMode = False):
                     temp.append(f"{LETTER_VARIANT[element.contents[0]]}")
             res[i][1] = temp
 
-        #wait.stop()
+        wait.stop()
 
         listTermXIn = set()
         listTermXOut = set(F0OnlyX)
@@ -259,25 +263,26 @@ def task2_4(pn, ll, internetMode = False):
                 repeationDict[num] = repeationDict.get(num, 0)  + 1
             SetNumber = set(number)
             print(f'{i+1}) Склеювання клітинок: {" ".join(number)}; результат: {"".join(letter)};')
-            MinTerms = sorted(F0Only1.intersection(SetNumber), key= lambda x: int(x, 16))
+            MinTerms = sorted(F0Only0.intersection(SetNumber), key= lambda x: int(x, 16))
             print(f'Мінімізуються набори: {" ".join(MinTerms)}')
             listTermXIn.update(F0OnlyX.intersection(SetNumber))
             listTermXOut.difference_update(SetNumber)
         listTermXIn = sorted(listTermXIn, key= lambda x: int(x, 16))
         listTermXOut = sorted(listTermXOut, key= lambda x: int(x, 16))
-        print(f'Невизначені значення функції в клітинках {" ".join(listTermXIn)} довизначаємо як "1", оскільки вони беруть участь у склеюванні за "1".')
-        print(f'Невизначені значення функції в клітинках {" ".join(listTermXOut)} довизначаємо як "0", оскільки вони не беруть участь у склеюванні за "1".')
+        print(f'Невизначені значення функції в клітинках {" ".join(listTermXIn)} довизначаємо як "0", оскільки вони беруть участь у склеюванні за "0".')
+        print(f'Невизначені значення функції в клітинках {" ".join(listTermXOut)} довизначаємо як "1", оскільки вони не беруть участь у склеюванні за "0".')
         #print(F0Only1)
         for i in range(max(repeationDict.values())):
             TermsRepeatI = []
             for key, values in repeationDict.items():
                 if values == i+1:
                     TermsRepeatI.append(key)
-            TermsRepeatI = sorted(TermsRepeatI, key= lambda x: int(x, 16))
-            if i == 0:
-                print(f'Набори {" ".join(TermsRepeatI)} беруть участь у {i+1} склеюванні.')
-            else:
-                print(f'Набори {" ".join(TermsRepeatI)} беруть участь у {i+1} склеюваннях.')
+            if len(TermsRepeatI) != 0:
+                TermsRepeatI = sorted(TermsRepeatI, key= lambda x: int(x, 16))
+                if i == 0:
+                    print(f'Набори {" ".join(TermsRepeatI)} беруть участь у {i+1} склеюванні.')
+                else:
+                    print(f'Набори {" ".join(TermsRepeatI)} беруть участь у {i+1} склеюваннях.')
         #print(*res, sep='\n')
 
         implicants = [create_implicant(let[1]) for let in res]
@@ -332,7 +337,8 @@ def task2_4(pn, ll, internetMode = False):
                     impRes.append([i, j, lilImpRes, lilImpResTr, lilTerm])
 
                     checker[i][j], checker[j][i] = '+', '+'
-        print(table_results(impRes))
+        tabres, LCT = table_results(impRes)
+        print(tabres)
 
 
 

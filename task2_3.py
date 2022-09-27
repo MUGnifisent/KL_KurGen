@@ -98,11 +98,15 @@ def table_implicants(implicants):
 
 
 def table_results(res):
-    prep = []
+    prep, lct = []
     for i in range(len(res)):
-        prep.append([f"i{res[i][0]} i{res[i][1]}", f"{res[i][2]}({res[i][3]})", res[i][4]])
+        if res[i][2].count('x') == 1:
+            prep.append([f"i{res[i][0]} i{res[i][1]}", f"{res[i][2]}({res[i][3]})", f"{res[i][4]}(+)"])
+            lct.append(res[i][4])
+        else:
+            prep.append([f"i{res[i][0]} i{res[i][1]}", f"{res[i][2]}({res[i][3]})", "-"])
     table = tabulate(prep, tablefmt="grid", headers=['Порівнюються', 'Результат', 'Терм'], stralign='center', numalign='center')
-    return table
+    return table, lct
 
 def generate_starting_tables(pn):
     tt, f = [], []
@@ -219,7 +223,7 @@ def task2_3(pn, ll, internetMode = False):
             for col in row.find_all("td"):
                 if len(col) > 0:
                     spans = col.find_all("span")
-                    if len(spans) > 1:
+                    if len(spans) > 0:
                         listSpan = []
                         for span in spans:
                             listSpan.append(span)
@@ -270,11 +274,12 @@ def task2_3(pn, ll, internetMode = False):
             for key, values in repeationDict.items():
                 if values == i+1:
                     TermsRepeatI.append(key)
-            TermsRepeatI = sorted(TermsRepeatI, key= lambda x: int(x, 16))
-            if i == 0:
-                print(f'Набори {" ".join(TermsRepeatI)} беруть участь у {i+1} склеюванні.')
-            else:
-                print(f'Набори {" ".join(TermsRepeatI)} беруть участь у {i+1} склеюваннях.')
+            if len(TermsRepeatI) != 0:
+                TermsRepeatI = sorted(TermsRepeatI, key= lambda x: int(x, 16))
+                if i == 0:
+                    print(f'Набори {" ".join(TermsRepeatI)} беруть участь у {i+1} склеюванні.')
+                else:
+                    print(f'Набори {" ".join(TermsRepeatI)} беруть участь у {i+1} склеюваннях.')
         #print(*res, sep='\n')
 
         implicants = [create_implicant(let[1]) for let in res]
@@ -329,7 +334,8 @@ def task2_3(pn, ll, internetMode = False):
                     impRes.append([i, j, lilImpRes, lilImpResTr, lilTerm])
 
                     checker[i][j], checker[j][i] = '+', '+'
-        print(table_results(impRes))
+        tabres, LCT = table_results(impRes)
+        print(tabres)
 
 
 if __name__ == '__main__':
