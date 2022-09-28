@@ -358,24 +358,46 @@ def sortByProbability(n, p, notEffective):
  
   
 def displayCalculated(n, p):
+    data_to_print = [],[],[],[],[],[]
+    data_to_print[0].append("Символ")
+    data_to_print[1].append("Імовірність")
+    data_to_print[2].append("Ефективний код")
+    data_to_print[3].append("Довжина")
+    data_to_print[4].append("Не ефективний код")
+    data_to_print[5].append("Довжина")
     print("\n\n\n\tСимвол\tІмовірність\tЕфективний код\tДовжина\tНе ефективний код\tДовжина",end='')
     for i in range(n - 1,-1,-1):
         k = 0
+        data_to_print[0].append(p[i].sym)
+        data_to_print[1].append(p[i].pro)
         print("\n\t", p[i].sym, "\t", p[i].pro,"\t\t",end='')
+        effective_code = ""
         for j in range(p[i].top+1):
             print(p[i].arr[j],end='')
+            effective_code += str(p[i].arr[j])
             if(p[i].arr[j] == 1 or p[i].arr[j] == 0):
                 k += 1
+        data_to_print[2].append(effective_code)
         print("\t\t", k, "\t\t",end='')
+        data_to_print[3].append(k)
         print(p[i].notEffectiveCode,end='')
+        data_to_print[4].append(p[i].notEffectiveCode)
         print("\t\t", 3,end='')
+        data_to_print[5].append(3)
+    
+    return data_to_print
 
 
 def displayRaw(n, p):
+    data_to_print = [],[],[]
     print("\n\n\n\tСимвол\tКількість\tІмовірність",end='')
     for i in range(n - 1,-1,-1):
         k = 0
+        data_to_print[0].append(p[n-1-i].sym)
+        data_to_print[1].append(p[n-1-i].k)
+        data_to_print[2].append(p[n-1-i].pro)
         print("\n\t", p[n-1-i].sym, "\t", p[n-1-i].k, "\t\t", p[n-1-i].pro,"\t",end='')
+    return data_to_print
 
 
 def print_table(matrix, posoffbit):

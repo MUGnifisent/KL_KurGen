@@ -1,8 +1,6 @@
 from utils.task2_utils import *                 #ver 0.1.3
 from docx.shared import Cm, Pt
-from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.table import WD_ALIGN_VERTICAL
-from docx.enum.table import WD_ROW_HEIGHT_RULE
+from utils.docx_utils import *
 
 def task2_1(pn):
     print("\n\n2.1")

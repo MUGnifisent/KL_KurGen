@@ -5,6 +5,9 @@ from docx.shared import Cm, Pt
 from tabulate import tabulate
 
 from utils.task1_utils import *
+from utils.docx_utils import *
+
+
 
 
 def task1_1(pn, listedLetters, document):
@@ -156,10 +159,12 @@ def task1_3(pn, document):
 
 
 
-def task1_4(listedLetters, pn):
+def task1_4(listedLetters, pn, document):
     print("\n\n1.4")
+    document.add_paragraph("""1.4 Виконати ефективне кодування визначених літер прізвища, при умові, що отримане за допомогою кодової таблиці число - десяткове і говорить про те, скільки разів у "повідомленні" зустрічається дана літера (при цьому, "повідомлення" складається всього з 8 обраних літер). 
+Визначити ефективність проведеного кодування та порівняти її з ентропією джерела повідомлення і ефективністю рівномірного кодування, тобто, з випадком, коли довжина коду для кожної літери одна й та сама. За допомогою отриманих кодів скласти повідомлення, яке складається з визначених літер у тій послідовності, в якій вони зустрічаються у прізвищі. Визначити довжину (в бітах) повідомлення при ефективному і рівномірному кодуванні.""")
     n = 8 #number of symbols
-
+    document.add_paragraph("")
     for i in range(8):
         p[i].sym = listedLetters[i]
         p[i].k = int(f"{pn[i][0]}{pn[i][1]}")
@@ -186,30 +191,102 @@ def task1_4(listedLetters, pn):
         if i == 7:
             p[i].pro = round(p[i].pro + totalPro,2)
 
-    displayRaw(n, p)
+    dtp = displayRaw(n, p)
+    firstTable = document.add_table(rows=9, cols=3)
+    firstTable.autofit = False
+    firstTable.alignment = WD_TABLE_ALIGNMENT.CENTER
+    for i in range(8):
+        for j in range(3):
+            block = firstTable.rows[i].cells[j]
+            set_cell_border(
+                block,
+                top={"sz": 5, "val": "single", "color": "#000000"},
+                bottom={"sz": 5, "val": "single", "color": "#000000"},
+                start={"sz": 5, "val": "single", "color": "#000000"},
+                end={"sz": 5, "val": "single", "color": "#000000"},
+            )
+            firstTable.rows[i].cells[j].text = str(dtp[j][i])
+
+    set_cell_border(
+        firstTable.rows[8].cells[1],
+        top={"sz": 5, "val": "single", "color": "#000000"},
+        bottom={"sz": 5, "val": "single", "color": "#000000"},
+        start={"sz": 5, "val": "single", "color": "#000000"},
+        end={"sz": 5, "val": "single", "color": "#000000"},
+    )
+    set_cell_border(
+        firstTable.rows[8].cells[2],
+        top={"sz": 5, "val": "single", "color": "#000000"},
+        bottom={"sz": 5, "val": "single", "color": "#000000"},
+        start={"sz": 5, "val": "single", "color": "#000000"},
+        end={"sz": 5, "val": "single", "color": "#000000"},
+    )
+    firstTable.rows[8].cells[1].text = "Σ = " + str(totalK)
+    firstTable.rows[8].cells[2].text = "Σ = 100%"
+
+    for i in range(9):
+        firstTable.rows[i].height_rule = WD_ROW_HEIGHT_RULE.EXACTLY
+        firstTable.rows[i].height = Pt(14)
+        for j in range(3):
+            cell = firstTable.rows[i].cells[j]
+            paragraph = cell.paragraphs[0]
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            if j == 0:
+                cell.width = Cm(1)
+            else:
+                cell.width = Cm(2.2)
+
     print("\n\t\t", "Σ=" + str(totalK), "\t\t", 1,"\t",end='') #підсумовує деякі дані
 
     sortByProbability(n, p, ['000', '001', '010', '011', '100', '101', '110', '111'])
  
     for i in range(n):
         p[i].top = -1
- 
-    
 
     shannon(0, n - 1, p)
-    displayCalculated(n, p)
+    dtp = displayCalculated(n, p)
+    document.add_paragraph("")
+    secondTable = document.add_table(rows=9, cols=6, style="Table Grid")
+    secondTable.autofit = False
+    secondTable.alignment = WD_TABLE_ALIGNMENT.CENTER
+
+    for i in range(9):
+        for j in range(6):
+            cell = secondTable.rows[i].cells[j]
+            secondTable.rows[i].cells[j].text = str(dtp[j][i])
+            paragraph = cell.paragraphs[0]
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            if j == 0:
+                cell.width = Cm(2)
+            elif j == 1:
+                cell.width = Cm(3)
+            elif j == 2:
+                cell.width = Cm(4)
+            elif j == 3:
+                cell.width = Cm(3)
+            elif j == 4:
+                cell.width = Cm(4.2)
+            elif j == 5:
+                cell.width = Cm(3)
 
     H = 0
     print("\n\nH = -(", end='')
+    dtp = "H = -("
     for i in range(8):
         H += p[n-1-i].pro * log(p[n-1-i].pro,2)
         if i != 7:
+            dtp += str(p[n-1-i].pro) + " * log2(" + str(p[n-1-i].pro) + ") + "
             print(str(p[n-1-i].pro) + " * log2(" + str(p[n-1-i].pro) + ") + ", end='')
         else:
-            print(str(p[n-1-i].pro) + " * log2(" + str(p[n-1-i].pro) + "))=" + str(-H),end='')
+            dtp += str(p[n-1-i].pro) + " * log2(" + str(p[n-1-i].pro) + "))=" + str(round(-H, 2))
+            print(str(p[n-1-i].pro) + " * log2(" + str(p[n-1-i].pro) + "))=" + str(round(-H, 2)),end='')
+    document.add_paragraph("")
+    document.add_paragraph(dtp)
     H = -H
     lEffective = 0
+    document.add_paragraph("L сер. не еф = 3")
     print("\nL сер. не еф = 3")
+    dtp = "L сер. еф = "
     print("L сер. еф = ", end='')
 
     for i in range(8):
@@ -219,16 +296,23 @@ def task1_4(listedLetters, pn):
                 k += 1
         lEffective += k * p[n-1-i].pro
         if i != 7:
+            dtp += str(k) + " * " + str(p[n-1-i].pro) + " + "
             print(str(k) + " * " + str(p[n-1-i].pro) + " + ", end='')
         else:
+            dtp += str(k) + " * " + str(p[n-1-i].pro) + " = " + str(round(lEffective, 2))
             print(str(k) + " * " + str(p[n-1-i].pro) + " = " + str(lEffective), end='')
+
+    document.add_paragraph(dtp)
     
     if lEffective < H and H < 3:
+        document.add_paragraph("L сер. еф < H < L сер. не еф")
         print("\n\nL сер. еф < H < L сер. не еф")
     elif lEffective > H and lEffective < 3:
-         print("\n\nH < L сер. еф < L сер. не еф")
+        document.add_paragraph("H < L сер. еф < L сер. не еф")
+        print("\n\nH < L сер. еф < L сер. не еф")
     elif lEffective > H and lEffective > 3:
-         print("\n\nH < L сер. не еф < L сер. еф ")
+        document.add_paragraph("H < L сер. не еф < L сер. еф")
+        print("\n\nH < L сер. не еф < L сер. еф")
 
     effectiveOutput = ""
     notEffectiveOutput = ""
@@ -242,8 +326,11 @@ def task1_4(listedLetters, pn):
         effectiveOutput += " "
         notEffectiveOutput += " "
     print("\n\n")
+    document.add_paragraph(effectiveOutput + " - " + str(len(effectiveOutput) - effectiveOutput.count(' ')) + " біт ефективний код")
     print(effectiveOutput + "  " + str(len(effectiveOutput) - effectiveOutput.count(' ')) + "біт")
+    document.add_paragraph(notEffectiveOutput + " - " + str(len(notEffectiveOutput) - notEffectiveOutput.count(' ')) + " біт не ефективний код")
     print(notEffectiveOutput + "  " + str(len(notEffectiveOutput) - notEffectiveOutput.count(' ')) + "біт")
+    document.add_page_break()
 
 
 def task1_5(ll, pn, document):
@@ -399,9 +486,9 @@ def task1_5(ll, pn, document):
     document.add_page_break()
 
 
-def task1_6(pn, ll):
+def task1_6(pn, ll, document):
     print("\n\n1.6")
-
+    
     m = Graph(KARNAUGH_MAP)
 
     print("Персональні коди:")
@@ -458,6 +545,6 @@ def task1(personalNumbers, listedLetters, document):
     task1_1(personalNumbers, listedLetters, document)
     task1_2(personalNumbers, listedLetters, document)
     task1_3(personalNumbers, document)
-    task1_4(listedLetters, personalNumbers)
+    task1_4(listedLetters, personalNumbers, document)
     task1_5(listedLetters, personalNumbers, document)
     task1_6(personalNumbers, listedLetters)
