@@ -45,9 +45,10 @@ def splitter():
 def print_with_arrows(l):
     p = ''
     for element in l:
-        p = p + element + ' -> '
-    p = p.rstrip(' -> ')
+        p = p + element + ' → '
+    p = p.rstrip(' → ')
     print(p)
+    return p
 
 
 def delete_repeating_elements_from_list(l):

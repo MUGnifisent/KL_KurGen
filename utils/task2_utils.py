@@ -1,5 +1,7 @@
 from lxml import etree
 import latex2mathml.converter
+from utils.docx_utils import *
+from docx.shared import Cm, Pt
 
 def CreateTableOfBinNum(LstOfBinNum, pn):       #ver 0.1.3
     print_array = [[], [], [], [], []]
@@ -16,6 +18,35 @@ def CreateTableOfBinNum(LstOfBinNum, pn):       #ver 0.1.3
         print()
         index+=1
     return print_array
+
+def TableCellDesign(cell, toparg, bottomarg, startarg, endarg, text):
+    cell.width = Cm(0.6)
+    type = "thickThinSmallGap"
+    if toparg == 1:
+        toparg={"sz": 5, "val": "single", "color": "#000000"}
+    if bottomarg == 1:
+        bottomarg={"sz": 5, "val": "single", "color": "#000000"}
+    if startarg == 1:
+        startarg={"sz": 5, "val": "single", "color": "#000000"}
+    if endarg == 1:
+        endarg={"sz": 5, "val": "single", "color": "#000000"}
+    if toparg == 2:
+        toparg={"sz": 5, "val": type, "color": "#000000"}
+    if bottomarg == 2:
+        bottomarg={"sz": 5, "val": type, "color": "#000000"}
+    if startarg == 2:
+        startarg={"sz": 5, "val": type, "color": "#000000"}
+    if endarg == 2:
+        endarg={"sz": 5, "val": type, "color": "#000000"}
+    set_cell_border(
+        cell,
+        top = toparg,
+        bottom = bottomarg,
+        start = startarg,
+        end = endarg
+    )
+    cell.text = str(text)
+    cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
 
 def FindPosXInF(LstOfBinNum):
     if LstOfBinNum[0][0] == '1':

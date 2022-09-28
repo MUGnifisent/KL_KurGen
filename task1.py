@@ -1,5 +1,6 @@
 from math import log                #ver 0.1.3
 from itertools import chain
+from turtle import width
 
 from docx.shared import Cm, Pt
 from tabulate import tabulate
@@ -488,39 +489,69 @@ def task1_5(ll, pn, document):
 
 def task1_6(pn, ll, document):
     print("\n\n1.6")
-    
+    document.add_paragraph("1.6 Для послідовності 16-кових цифр (1ц1л)(2ц1л)(1ц2л)(2ц2л)(1ц3л)(2ц3л)...(2ц7л)( 1ц8л)(2ц8л), користуючись картами Карно, визначити всі можливі помилкові коди, які можуть виникати при переході від цифри до цифри.")
     m = Graph(KARNAUGH_MAP)
 
     print("Персональні коди:")
+    dtp = ""
     for i in range(len(pn)):
+        dtp += f"{ll[i]} → {pn[i][0]}{pn[i][1]}  "
         print(f"{ll[i]} - {pn[i]} ", end='')
     print()
+    document.add_paragraph(dtp)
 
     conversionList = [str(i) for i in list(chain.from_iterable(pn))]
     print(f"Список переходів, трансформований з персональних кодів:")
-    print_with_arrows(conversionList)
+    document.add_paragraph("Визначення всіх можливих помилкових кодів:")
+    dtp = print_with_arrows(conversionList)
+    document.add_paragraph(dtp)
     table = tabulate(KARNAUGH_MAP_TABLE, tablefmt="grid")
+    firstTable = document.add_table(rows=17, cols=6)
+    #firstTable.autofit = False
+    tableNumber = 1
+    for i in range(17):
+        for j in range(6):
+            if j == 0 or j == 3:
+                firstTable.rows[i].cells[j].width = Cm(0.5)
+            elif i % 2 == 0 and (j == 1 or j == 4):
+                    a = firstTable.cell(i, j)
+                    b = firstTable.cell(i, j+1)
+                    a.merge(b)
+            if i % 2 != 0 and (j == 1 or j == 4) and tableNumber != 16:
+                firstTable.rows[i].cells[j-1].text = str(tableNumber) + ")"
+                tableNumber += 1
+                cell = firstTable.rows[i].cells[j]
+                paragraph = cell.paragraphs[0]
+                run = paragraph.add_run()
+                run.add_picture("images/karno.png", width = Cm(3.7), height = Cm(3.7))
+
+    row = 1
+    k = 0
+
     for i in range(15):
         splitter()
         print(table)
+        codes_walked_through = ""
+        error_codes = ""
         if conversionList[i] != conversionList[i + 1]:
             b1 = str(bin(int(conversionList[i], 16)))
             b2 = str(bin(int(conversionList[i + 1], 16)))
             b1 = b1.lstrip("0b").zfill(4)
             b2 = b2.lstrip("0b").zfill(4)
-            print(f"{conversionList[i]} -> {conversionList[i + 1]}: {b1} -> {b2}")
+            conversionListText = f"{conversionList[i]} → {conversionList[i + 1]}: {b1} → {b2}\n"
+            print(f"{conversionList[i]} → {conversionList[i + 1]}: {b1} → {b2}")
             n = m.all_shortest_paths(conversionList[i], conversionList[i + 1])
             for element in n:
-                print_with_arrows(element)
+                codes_walked_through += print_with_arrows(element) + "\n"
 
             if len(n) != 1:
                 p = "Помилкові коди:"
                 l = []
                 for j in n:
-                    i = j
-                    del i[0]
-                    del i [-1]
-                    for element in i:
+                    z = j
+                    del z[0]
+                    del z [-1]
+                    for element in z:
                         l.append(element)
                     l = delete_repeating_elements_from_list(l)
                 for element in l:
@@ -528,17 +559,47 @@ def task1_6(pn, ll, document):
                     b = b.lstrip("0b").zfill(4)
                     p += f" {b},"
                 p = p.rstrip(",")
-                p += "."
                 print(p)
+                error_codes = p
             else:
                 print("Помилкових кодів немає.")
+                error_codes = "Помилкових кодів немає"
         else:
             b1 = str(bin(int(conversionList[i], 16)))
             b2 = str(bin(int(conversionList[i + 1], 16)))
             b1 = b1.lstrip("0b").zfill(4)
             b2 = b2.lstrip("0b").zfill(4)
-            print(f"{conversionList[i]} -> {conversionList[i + 1]}: {b1} -> {b2}\n")
-            print("Помилкових кодів немає.")
+            conversionListText = f"{conversionList[i]} → {conversionList[i + 1]}: {b1} → {b2}\n"
+            print(f"{conversionList[i]} → {conversionList[i + 1]}: {b1} → {b2}\n")
+            print("Помилкових кодів немає")
+            error_codes = "Помилкових кодів немає"
+        if k == 2:
+            row += 2
+            k = 0
+        if int(i+1) % 2 != 0:
+            firstTable.rows[row+1].cells[2].text = error_codes
+            paragraph = firstTable.rows[row+1].cells[2].paragraphs[0]
+            run = paragraph.runs
+            font = run[0].font
+            font.size= Pt(8)
+            firstTable.rows[row].cells[2].text = conversionListText + codes_walked_through
+            paragraph = firstTable.rows[row].cells[2].paragraphs[0]
+            run = paragraph.runs
+            font = run[0].font
+            font.size= Pt(8)
+        else:
+            firstTable.rows[row+1].cells[5].text = error_codes
+            paragraph = firstTable.rows[row+1].cells[5].paragraphs[0]
+            run = paragraph.runs
+            font = run[0].font
+            font.size= Pt(8)
+            firstTable.rows[row].cells[5].text = conversionListText + codes_walked_through
+            paragraph = firstTable.rows[row].cells[5].paragraphs[0]
+            run = paragraph.runs
+            font = run[0].font
+            font.size= Pt(8)
+        k += 1
+    document.add_page_break()
 
 
 def task1(personalNumbers, listedLetters, document):
@@ -547,4 +608,4 @@ def task1(personalNumbers, listedLetters, document):
     task1_3(personalNumbers, document)
     task1_4(listedLetters, personalNumbers, document)
     task1_5(listedLetters, personalNumbers, document)
-    task1_6(personalNumbers, listedLetters)
+    task1_6(personalNumbers, listedLetters, document)

@@ -1,10 +1,12 @@
 from utils.task2_utils import *                 #ver 0.1.3
-from docx.shared import Cm, Pt
-from utils.docx_utils import *
 
-def task2_1(pn):
+
+
+def task2_1(pn, document):
     print("\n\n2.1")
-
+    document.add_paragraph("""2.1 Визначити класи функцій алгебри логіки, до яких належить задана за допомогою таблиці функція трьох змінних (табл. ТZ.2), та її функціональну повноту. 
+Двійкові коди цифр у графі "f" табл. ТZ.2 потрібно написати вертикально, старший розряд - наверху.""")
+    
     print("Числа:")
     firstNumber = bin(int(str(pn[3][0]), 10))[2:]
     secondNumber = bin(int(str(pn[6][1]), 10))[2:]
@@ -17,29 +19,73 @@ def task2_1(pn):
             secondNumber = "0" + str(secondNumber)
 
     print(f"1ц4л - {pn[3][0]} -> {firstNumber} \n2ц7л - {pn[6][1]} -> {secondNumber}\n")
+    document.add_paragraph(f"Числа: 1ц4л - {pn[3][0]} → {firstNumber}  2ц7л - {pn[6][1]} → {secondNumber}")
 
     bothNumbers = str(firstNumber) + str(secondNumber)
     TZ2 = [[0, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 1, 1, 0], [1, 0, 0, 0], [1, 0, 1, 0], [1, 1, 0, 0], [1, 1, 1, 0]]
+
+    firstTable = document.add_table(rows=9, cols=5)
+    firstTable.autofit = False
 
     for i in range(8):
         TZ2[i][3] = int(str(bothNumbers)[i])
 
     print("a b c | f")
+
+    TableCellDesign(firstTable.rows[0].cells[0], 1, 1, 1, 0, str("a"))
+    TableCellDesign(firstTable.rows[0].cells[1], 1, 1, 0, 0, str("b"))
+    TableCellDesign(firstTable.rows[0].cells[2], 1, 1, 0, 1, str("c"))
+    TableCellDesign(firstTable.rows[0].cells[3], 1, 1, 0, 1, str("f"))
+    firstTable.rows[0].height_rule = WD_ROW_HEIGHT_RULE.EXACTLY
+    firstTable.rows[0].height = Pt(14)
+    firstTable.rows[0].cells[4].width = Cm(15)
+
     for i in range(8):
         print(TZ2[i][0], TZ2[i][1], TZ2[i][2],"|", TZ2[i][3])
+
+    for i in range(8):
+        firstTable.rows[i+1].cells[4].width = Cm(15)
+        firstTable.rows[i+1].height_rule = WD_ROW_HEIGHT_RULE.EXACTLY
+        firstTable.rows[i+1].height = Pt(14)
+        if i == 4:
+            TableCellDesign(firstTable.rows[i+1].cells[0], 1, 0, 1, 0, str(TZ2[i][0]))
+            TableCellDesign(firstTable.rows[i+1].cells[1], 1, 0, 0, 0, str(TZ2[i][1]))
+            TableCellDesign(firstTable.rows[i+1].cells[2], 1, 0, 0, 1, str(TZ2[i][2]))
+            TableCellDesign(firstTable.rows[i+1].cells[3], 1, 0, 0, 1, str(TZ2[i][3]))
+        if i == 7:
+            TableCellDesign(firstTable.rows[i+1].cells[0], 0, 1, 1, 0, str(TZ2[i][0]))
+            TableCellDesign(firstTable.rows[i+1].cells[1], 0, 1, 0, 0, str(TZ2[i][1]))
+            TableCellDesign(firstTable.rows[i+1].cells[2], 0, 1, 0, 1, str(TZ2[i][2]))
+            TableCellDesign(firstTable.rows[i+1].cells[3], 0, 1, 0, 1, str(TZ2[i][3]))
+        else:
+            TableCellDesign(firstTable.rows[i+1].cells[0], 0, 0, 1, 0, str(TZ2[i][0]))
+            TableCellDesign(firstTable.rows[i+1].cells[1], 0, 0, 0, 0, str(TZ2[i][1]))
+            TableCellDesign(firstTable.rows[i+1].cells[2], 0, 0, 0, 1, str(TZ2[i][2]))
+            TableCellDesign(firstTable.rows[i+1].cells[3], 0, 0, 0, 1, str(TZ2[i][3]))
+    
+    a = firstTable.cell(0, 4)
+    b = firstTable.cell(3, 4)
+    a.merge(b)
+    a = firstTable.cell(4, 4)
+    b = firstTable.cell(8, 4)
+    a.merge(b)
 
     Rule1 = False
     Rule2 = False
 
     if TZ2[0][3] == 0:
+        firstTable.rows[0].cells[4].text = "1) Функція на нульовому наборі змінних f(0,0,0) = 0. Отже, функція зберігає константу «0»."
         print("1) Функція на нульовому наборі змінних f(0,0,0) = 0. Отже, функція зберігає константу «0».")
         Rule1 = True
     else:
+        firstTable.rows[0].cells[4].text = "1) Функція на нульовому наборі змінних f(0,0,0) = 1. Отже, функція не зберігає константу «0»."
         print("1) Функція на нульовому наборі змінних f(0,0,0) = 1. Отже, функція не зберігає константу «0».")
     if TZ2[7][3] == 1:
+        firstTable.rows[4].cells[4].text = "2) Функція на одиничному наборі змінних f(1,1,1) = 1. Отже, функція зберігає константу «1»."
         print("2) Функція на одиничному наборі змінних f(1,1,1) = 1. Отже, функція зберігає константу «1».")
         Rule2 = True
     else:
+        firstTable.rows[4].cells[4].text = "2) Функція на одиничному наборі змінних f(1,1,1) = 0. Отже, функція не зберігає константу «1»."
         print("2) Функція на одиничному наборі змінних f(1,1,1) = 0. Отже, функція не зберігає константу «1».")
 
     monoTableArray = [[[0 for x in range(4)] for y in range(4)] for z in range(6)]
@@ -75,26 +121,77 @@ def task2_1(pn):
             else:
                 tempValue = monoTableArray[i][j][3]
 
+
+
     if isMonotonic:
+        document.add_paragraph("3) Функція є монотонною, оскільки при будь-якому зростанні кількості '1' у послідовності сусідніх наборів змінних значення функції не зменшується.")
         print("3) Функція є монотонною, оскільки при будь-якому зростанні кількості '1' у послідовності сусідніх наборів змінних значення функції не зменшується.")
     else:
+        document.add_paragraph("3) Функція не є монотонною, оскільки при будь-якому зростанні кількості '1' у послідовності сусідніх наборів змінних значення функції зменшується.")
         print("3) Функція не є монотонною, оскільки при будь-якому зростанні кількості '1' у послідовності сусідніх наборів змінних значення функції зменшується.")
-
+    secondTable = document.add_table(rows=5, cols=29)
+    secondTable.autofit = False
     print("a b c | f    a b c | f    a b c | f    a b c | f    a b c | f    a b c | f")
+    index = 0
+    for i in range(6):
+        TableCellDesign(secondTable.rows[0].cells[index], 1, 1, 1, 0, "a")
+        index += 1
+        TableCellDesign(secondTable.rows[0].cells[index], 1, 1, 0, 0, "b")
+        index += 1
+        TableCellDesign(secondTable.rows[0].cells[index], 1, 1, 0, 1, "c")
+        index += 1
+        TableCellDesign(secondTable.rows[0].cells[index], 1, 1, 0, 1, "f")
+        index += 2
 
+    secondTable.rows[0].height_rule = WD_ROW_HEIGHT_RULE.EXACTLY
+    secondTable.rows[0].height = Pt(14)
     for i in range(4):
+        secondTable.rows[i+1].height_rule = WD_ROW_HEIGHT_RULE.EXACTLY
+        secondTable.rows[i+1].height = Pt(14)
+        index = 0
         for j in range(6):
             for k in range(4):
                 if k != 3:
+                    if i != 3 and k == 0:
+                        TableCellDesign(secondTable.rows[i+1].cells[index], 0, 0, 1, 0, monoTableArray[j][i][k])
+                    elif i !=3 and k == 1:
+                        TableCellDesign(secondTable.rows[i+1].cells[index], 0, 0, 0, 0, monoTableArray[j][i][k])
+                    elif i !=3 and k == 2:
+                        TableCellDesign(secondTable.rows[i+1].cells[index], 0, 0, 0, 1, monoTableArray[j][i][k])
+                    elif i == 3 and k == 0:
+                        TableCellDesign(secondTable.rows[i+1].cells[index], 0, 1, 1, 0, monoTableArray[j][i][k])
+                    elif i ==3 and k == 1:
+                        TableCellDesign(secondTable.rows[i+1].cells[index], 0, 1, 0, 0, monoTableArray[j][i][k])
+                    elif i ==3 and k == 2:
+                        TableCellDesign(secondTable.rows[i+1].cells[index], 0, 1, 0, 1, monoTableArray[j][i][k])
                     print(monoTableArray[j][i][k], end=" ")
                 else:
                     if monoTableArray[j][i][k] == 9:
-                        print("||o̲|", end="")
-                    elif monoTableArray[j][i][k] == 10:
+                        if i != 3:
+                            TableCellDesign(secondTable.rows[i+1].cells[index], 0, 2, 2, 2, "0")
+                        else:
+                            TableCellDesign(secondTable.rows[i+1].cells[index], 0, 2, 2, 2, "0")
                         print("||̅₁|", end="")
+                        #table_cell_properties = secondTable.rows[i+1].cells[index]._tc.get_or_add_tcPr()
+                        #shade_obj = OxmlElement('w:shd')
+                        #shade_obj.set(qn('w:fill'), "f03a3a")
+                        #table_cell_properties.append(shade_obj)
+                    elif monoTableArray[j][i][k] == 10:
+                        TableCellDesign(secondTable.rows[i+1].cells[index], 2, 0, 2, 2, "1")
+                        print("||̅₁|", end="")
+                        #table_cell_properties = secondTable.rows[i+1].cells[index]._tc.get_or_add_tcPr()
+                        #shade_obj = OxmlElement('w:shd')
+                        #shade_obj.set(qn('w:fill'), "f03a3a")
+                        #table_cell_properties.append(shade_obj)
                     else:
+                        if i != 3:
+                            TableCellDesign(secondTable.rows[i+1].cells[index], 0, 0, 0, 1, monoTableArray[j][i][k])
+                        else:
+                            TableCellDesign(secondTable.rows[i+1].cells[index], 0, 1, 0, 1, monoTableArray[j][i][k])
                         print("|", monoTableArray[j][i][k], end=" ")
+                index+=1
             print(end="   ")
+            index += 1
         print()
     
     isSelfdual = [0,0,0,0]
@@ -104,45 +201,99 @@ def task2_1(pn):
             isSelfdual[i] = 1
 
     if isSelfdual[0] + isSelfdual[1] + isSelfdual[2] + isSelfdual[3] == 0:
+        document.add_paragraph("4) Функція є самодвоїстою")
         print("4) Функція є самодвоїстою")
         Rule4 = True
     else:
+        dtp = "4) Функція не є самодвоїстою, оскільки на "
         print("4) Функція не є самодвоїстою, оскільки на", end=" ")
         if isSelfdual[0] == 1:
+            dtp += "першій, "
             print("першій,", end=" ")
         if isSelfdual[1] == 1:
-          print("другій,", end=" ")
+            dtp += "другій, "
+            print("другій,", end=" ")
         if isSelfdual[2] == 1:
-          print("третій,", end=" ")
+            dtp += "третій, "
+            print("третій, ", end=" ")
         if isSelfdual[3] == 1:
-            print("четвертій,", end=" ")       
+            dtp += "четвертій, "
+            print("четвертій, ", end=" ") 
+        dtp = dtp[:-2]
+        dtp += " парі протилежних наборів функція не приймає протилежні значення."
         print("\b\b парі протилежних наборів функція не приймає протилежні значення.")
+        document.add_paragraph(dtp)
+    thirdTable = document.add_table(rows=5, cols=8)
+    thirdTable.autofit = False
     print("a b c | f | a b c | f")
+    index = 0
+    thirdTable.rows[0].height_rule = WD_ROW_HEIGHT_RULE.EXACTLY
+    thirdTable.rows[0].height = Pt(14)
+    for i in range(2):
+        TableCellDesign(thirdTable.rows[0].cells[index], 1, 1, 1, 0, "a")
+        index += 1
+        TableCellDesign(thirdTable.rows[0].cells[index], 1, 1, 0, 0, "b")
+        index += 1
+        TableCellDesign(thirdTable.rows[0].cells[index], 1, 1, 0, 1, "c")
+        index += 1
+        TableCellDesign(thirdTable.rows[0].cells[index], 1, 1, 0, 1, "f")
+        index += 1
+    
     for i in range(4):
+        thirdTable.rows[i+1].height_rule = WD_ROW_HEIGHT_RULE.EXACTLY
+        thirdTable.rows[i+1].height = Pt(16)
+        if i == 3:
+            TableCellDesign(thirdTable.rows[i+1].cells[0], 0, 1, 1, 0, TZ2[i][0])
+            TableCellDesign(thirdTable.rows[i+1].cells[1], 0, 1, 0, 0, TZ2[i][1])
+            TableCellDesign(thirdTable.rows[i+1].cells[2], 0, 1, 0, 1, TZ2[i][2])
+            TableCellDesign(thirdTable.rows[i+1].cells[3], 0, 1, 0, 1, TZ2[i][3])
+            TableCellDesign(thirdTable.rows[i+1].cells[4], 0, 1, 1, 0, TZ2[7-i][0])
+            TableCellDesign(thirdTable.rows[i+1].cells[5], 0, 1, 0, 0, TZ2[7-i][1])
+            TableCellDesign(thirdTable.rows[i+1].cells[6], 0, 1, 0, 1, TZ2[7-i][2])
+            TableCellDesign(thirdTable.rows[i+1].cells[7], 0, 1, 0, 1, TZ2[7-i][3])
+        else:
+            TableCellDesign(thirdTable.rows[i+1].cells[0], 0, 0, 1, 0, TZ2[i][0])
+            TableCellDesign(thirdTable.rows[i+1].cells[1], 0, 0, 0, 0, TZ2[i][1])
+            TableCellDesign(thirdTable.rows[i+1].cells[2], 0, 0, 0, 1, TZ2[i][2])
+            TableCellDesign(thirdTable.rows[i+1].cells[3], 0, 0, 0, 1, TZ2[i][3])
+            TableCellDesign(thirdTable.rows[i+1].cells[4], 0, 0, 1, 0, TZ2[7-i][0])
+            TableCellDesign(thirdTable.rows[i+1].cells[5], 0, 0, 0, 0, TZ2[7-i][1])
+            TableCellDesign(thirdTable.rows[i+1].cells[6], 0, 0, 0, 1, TZ2[7-i][2])
+            TableCellDesign(thirdTable.rows[i+1].cells[7], 0, 0, 0, 1, TZ2[7-i][3])
         print(TZ2[i][0], TZ2[i][1], TZ2[i][2], "|", TZ2[i][3], "|", TZ2[7-i][0], TZ2[7-i][1], TZ2[7-i][2], "|", TZ2[7-i][3])
 
-
+    document.add_paragraph("5) Для визначення лінійності функції подамо її у вигляді полінома Жегалкіна:")
     print("5) Для визначення лінійності функції подамо її у вигляді полінома Жегалкіна:")
     Zhegalkin = "" 
-
+    p = document.add_paragraph()
+    p.add_run()
     for i in range(8):
         if TZ2[i][3] == 1:
+            if Zhegalkin != "":
+                p.runs[0]._element.append(latex_to_word("⊕ "))
             if TZ2[i][0] == 0:
+                p.runs[0]._element.append(latex_to_word("\\bar{a}"))
                 Zhegalkin += "/a"
             else:
+                p.runs[0]._element.append(latex_to_word("a"))
                 Zhegalkin += "a"
             if TZ2[i][1] == 0:
+                p.runs[0]._element.append(latex_to_word("\\bar{b}"))
                 Zhegalkin += "/b"
             else:
                 Zhegalkin += "b"
+                p.runs[0]._element.append(latex_to_word("b"))
             if TZ2[i][2] == 0:
                 Zhegalkin += "/c"
+                p.runs[0]._element.append(latex_to_word("\\bar{c}"))
             else:
                 Zhegalkin += "c"
+                p.runs[0]._element.append(latex_to_word("c"))
             Zhegalkin += "⊕ "
 
     Zhegalkin = Zhegalkin[:-1]
-    print(Zhegalkin, end="\b = ")
+    dtp = "= "
+    print(Zhegalkin, end=" = ")
     
     ZhegalkinStep2 = ""
     ZhegalkinStep2Skip = False
@@ -160,10 +311,13 @@ def task2_1(pn):
 
     for i in range(len(ZhegalkinStep2)):
         if ZhegalkinStep2[i] == "+":
+            dtp += "⊕ "
             print("⊕ ", end="")
         elif i == len(ZhegalkinStep2) - 1:
+            dtp += " = "
             print(" = ", end="")
         else:
+            dtp += ZhegalkinStep2[i]
             print(ZhegalkinStep2[i], end="")
     
     
@@ -214,7 +368,9 @@ def task2_1(pn):
             ZhegalkinStep3Print += ")⊕ "
 
     ZhegalkinStep3Print = ZhegalkinStep3Print[:-2]
+    dtp += ZhegalkinStep3Print + "= "
     print(ZhegalkinStep3Print, "= ")
+    dtp += "\n= "
     print("= ", end="")
     ZhegalkinFinalOutput = []
     ZhegalkinFilter = []
@@ -254,14 +410,18 @@ def task2_1(pn):
                     list1[len(SukaYakYaZaebavsya[i]) - 1 - j] = "="
                     SukaYakYaZaebavsya[i] = '' .join(list1)
                     break
+        dtp += SukaYakYaZaebavsya[i] + "\n"
         print(SukaYakYaZaebavsya[i])
     
+    dtp += "= "
     print("= ",end="")
     remains = "("
     for i in range(len(ZhegalkinFinalOutput)):
         if i == len(ZhegalkinFinalOutput)-1:
+            dtp += ZhegalkinFinalOutput[i]
             print(ZhegalkinFinalOutput[i])
         else:
+            dtp += ZhegalkinFinalOutput[i] + "⊕ "
             print(ZhegalkinFinalOutput[i], "⊕  " ,end="")
         if len(ZhegalkinFinalOutput[i]) != 1:
             remains += str(ZhegalkinFinalOutput[i]) + ", "
@@ -272,16 +432,21 @@ def task2_1(pn):
     Rule5 = False
 
     if len(remains) > 2:
+        dtp += " " + remains[:-2] + " - це добутки змінних)"
         print(remains, "\b\b - це добутки змінних)")
+        p.add_run().text = dtp
         print("Оскільки поліном містить добутки змінних, то функція нелінійна.")
+        document.add_paragraph("Оскільки поліном містить добутки змінних, то функція нелінійна.")
     else:
+        p.add_run().text = dtp
+        document.add_paragraph("Оскільки поліном не містить добутки змінних, то функція лінійна.")
         print("Оскільки поліном не містить добутки змінних, то функція лінійна.")
         Rule5 = True
 
     rulesCount = 0
 
     rules = ""
-
+    dtp = ""
     if Rule1:
         rulesCount += 1
         rules += "не зберігання константи '0', "
@@ -314,23 +479,32 @@ def task2_1(pn):
 
     match rulesCount:
         case 1:
+            dtp += "Отже, із п'яти необхідних для створення ФПС властивостей відсутня одна "
             print("Отже, із п'яти необхідних для створення ФПС властивостей відсутня одна ", end="")
         case 2:
+            dtp += "Отже, із п'яти необхідних для створення ФПС властивостей відсутні дві "
             print("Отже, із п'яти необхідних для створення ФПС властивостей відсутні дві ", end="")
         case 3:
+            dtp += "Отже, із п'яти необхідних для створення ФПС властивостей відсутні три "
             print("Отже, із п'яти необхідних для створення ФПС властивостей відсутні три ", end="")
         case 4:
+            dtp += "Отже, із п'яти необхідних для створення ФПС властивостей відсутні чотири "
             print("Отже, із п'яти необхідних для створення ФПС властивостей відсутні чотири ", end="")
         case 5:
+            dtp += "Отже, із п'яти необхідних для створення ФПС властивостей відсутні п'ять "
             print("Отже, із п'яти необхідних для створення ФПС властивостей відсутні п'ять ", end="")
         case 0:
+            dtp += "Отже, із п'яти необхідних для створення ФПС властивостей присутні усі"
             print("Отже, із п'яти необхідних для створення ФПС властивостей присутні усі", end="")
 
     if rulesCount != 0:
+        dtp += rules[:-2] + " тому дана функція не утворює ФПС."
         print(rules, "\b\b тому дана функція не утворює ФПС.")
     else:
+        dtp += " тому дана функція утворює ФПС."
         print(" тому дана функція утворює ФПС.")
-
+    document.add_paragraph(dtp)
+    document.add_page_break()
 
 def task2_2(personalNumbers, listedLetters, document):
     print('\n\n2.2')
@@ -719,5 +893,5 @@ def task2_2(personalNumbers, listedLetters, document):
 
 
 def task2(personalNumbers, listedLetters, document):
-    task2_1(personalNumbers)
+    task2_1(personalNumbers, document)
     task2_2(personalNumbers, listedLetters, document)
