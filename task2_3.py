@@ -261,15 +261,15 @@ def task2_3(pn, ll, internetMode = False):
             for num in number:
                 repeationDict[num] = repeationDict.get(num, 0)  + 1
             SetNumber = set(number)
-            print(f'{i+1}) Склеювання клітинок: {" ".join(number)}; результат: {"".join(letter)};')
+            print(f'{i+1}) Склеювання клітинок: {", ".join(number)}; результат: {"".join(letter)};')
             MinTerms = sorted(F0Only1.intersection(SetNumber), key= lambda x: int(x, 16))
-            print(f'Мінімізуються набори: {" ".join(MinTerms)}')
+            print(f'Мінімізуються набори: {", ".join(MinTerms)}')
             listTermXIn.update(F0OnlyX.intersection(SetNumber))
             listTermXOut.difference_update(SetNumber)
         listTermXIn = sorted(listTermXIn, key= lambda x: int(x, 16))
         listTermXOut = sorted(listTermXOut, key= lambda x: int(x, 16))
-        print(f'Невизначені значення функції в клітинках {" ".join(listTermXIn)} довизначаємо як "1", оскільки вони беруть участь у склеюванні за "1".')
-        print(f'Невизначені значення функції в клітинках {" ".join(listTermXOut)} довизначаємо як "0", оскільки вони не беруть участь у склеюванні за "1".')
+        print(f'Невизначені значення функції в клітинках {", ".join(listTermXIn)} довизначаємо як "1", оскільки вони беруть участь у склеюванні за "1".')
+        print(f'Невизначені значення функції в клітинках {", ".join(listTermXOut)} довизначаємо як "0", оскільки вони не беруть участь у склеюванні за "1".')
         #print(F0Only1)
         for i in range(max(repeationDict.values())):
             TermsRepeatI = []
@@ -279,19 +279,13 @@ def task2_3(pn, ll, internetMode = False):
             if len(TermsRepeatI) != 0:
                 TermsRepeatI = sorted(TermsRepeatI, key= lambda x: int(x, 16))
                 if i == 0:
-                    print(f'Набори {" ".join(TermsRepeatI)} беруть участь у {i+1} склеюванні.')
+                    print(f'Набори {", ".join(TermsRepeatI)} беруть участь у {i+1} склеюванні.')
                 else:
-                    print(f'Набори {" ".join(TermsRepeatI)} беруть участь у {i+1} склеюваннях.')
+                    print(f'Набори {", ".join(TermsRepeatI)} беруть участь у {i+1} склеюваннях.')
         #print(*res, sep='\n')
 
         implicants = [create_implicant(let[1]) for let in res]
-        #for i in range(len(res)):
-        #    implicants.append(['-', '-', '-', '-', '-'])
-        #    for element in res[i][1]:
-        #        if '/' in element:
-        #            temp = element.lstrip('/')
-        #            implicants[i][ord(temp) - 97] = '0'
-        #        else:
+        
         #            implicants[i][ord(element) - 97] = '1'
         
         print(table_implicants(implicants))

@@ -274,15 +274,15 @@ def task2_4(pn, ll, internetMode = False):
             for num in number:
                 repeationDict[num] = repeationDict.get(num, 0)  + 1
             SetNumber = set(number)
-            print(f'{i+1}) Склеювання клітинок: {" ".join(number)}; результат: {"".join(letter)};')
+            print(f'{i+1}) Склеювання клітинок: {", ".join(number)}; результат: {"".join(letter)};')
             MinTerms = sorted(F0Only0.intersection(SetNumber), key= lambda x: int(x, 16))
-            print(f'Мінімізуються набори: {" ".join(MinTerms)}')
+            print(f'Мінімізуються набори: {", ".join(MinTerms)}')
             listTermXIn.update(F0OnlyX.intersection(SetNumber))
             listTermXOut.difference_update(SetNumber)
         listTermXIn = sorted(listTermXIn, key= lambda x: int(x, 16))
         listTermXOut = sorted(listTermXOut, key= lambda x: int(x, 16))
-        print(f'Невизначені значення функції в клітинках {" ".join(listTermXIn)} довизначаємо як "0", оскільки вони беруть участь у склеюванні за "0".')
-        print(f'Невизначені значення функції в клітинках {" ".join(listTermXOut)} довизначаємо як "1", оскільки вони не беруть участь у склеюванні за "0".')
+        print(f'Невизначені значення функції в клітинках {", ".join(listTermXIn)} довизначаємо як "0", оскільки вони беруть участь у склеюванні за "0".')
+        print(f'Невизначені значення функції в клітинках {", ".join(listTermXOut)} довизначаємо як "1", оскільки вони не беруть участь у склеюванні за "0".')
         #print(F0Only1)
         for i in range(max(repeationDict.values())):
             TermsRepeatI = []
@@ -292,9 +292,9 @@ def task2_4(pn, ll, internetMode = False):
             if len(TermsRepeatI) != 0:
                 TermsRepeatI = sorted(TermsRepeatI, key= lambda x: int(x, 16))
                 if i == 0:
-                    print(f'Набори {" ".join(TermsRepeatI)} беруть участь у {i+1} склеюванні.')
+                    print(f'Набори {", ".join(TermsRepeatI)} беруть участь у {i+1} склеюванні.')
                 else:
-                    print(f'Набори {" ".join(TermsRepeatI)} беруть участь у {i+1} склеюваннях.')
+                    print(f'Набори {", ".join(TermsRepeatI)} беруть участь у {i+1} склеюваннях.')
         #print(*res, sep='\n')
 
         implicants = [create_implicant(let[1]) for let in res]
@@ -353,7 +353,7 @@ def task2_4(pn, ll, internetMode = False):
         print(tabres)
         LCT_str = [''.join(i) for i in LCT]
         print(f'Отже, сполучними термами є: {", ".join(LCT_str)}.')
-        
+
         print('Оскільки склеювання проводиться за “0”, то в результаті мінімізації отримаємо диз’юнктивну нормальну форму для інверсного значення функції f :')
         print('/f = ', end='')
         FullTerms = ResLetter + LCT
