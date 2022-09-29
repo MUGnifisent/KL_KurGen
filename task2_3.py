@@ -254,8 +254,10 @@ def task2_3(pn, ll, internetMode = False):
         listTermXIn = set()
         listTermXOut = set(F0OnlyX)
         repeationDict = {}
+        ResLetter = []
         for i, NumAndLet in enumerate(res):
             number, letter = NumAndLet
+            ResLetter.append(letter)
             for num in number:
                 repeationDict[num] = repeationDict.get(num, 0)  + 1
             SetNumber = set(number)
@@ -336,6 +338,15 @@ def task2_3(pn, ll, internetMode = False):
                     checker[i][j], checker[j][i] = '+', '+'
         tabres, LCT = table_results(impRes)
         print(tabres)
+        
+        print(f'Отже, сполучними термами є: {", ".join(LCT)}.')
+        print('Остаточна функція:')
+        print('f = ', end='')
+        FullTerms = ResLetter + LCT
+        for item in FullTerms:
+            print(f'{"".join([i for i in item])}', end='')
+            if FullTerms.index(item) != len(FullTerms) - 1:
+                print(' v ',end='')
 
 
 if __name__ == '__main__':
