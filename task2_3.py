@@ -340,7 +340,7 @@ def task2_3(pn, ll, internetMode = False):
         print(tabres)
         
         print(f'Отже, сполучними термами є: {", ".join(LCT)}.')
-        print('Остаточна функція:')
+        print('Кінцева функція:')
         print('f = ', end='')
         FullTerms = ResLetter + LCT
         for item in FullTerms:

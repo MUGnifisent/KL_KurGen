@@ -100,7 +100,7 @@ def table_results(res):
     prep, lct = [], []
     for i in range(len(res)):
         if res[i][2].count('x') == 1:
-            prep.append([f"i{res[i][0]} i{res[i][1]}", f"{res[i][2]}({res[i][3]})", f"{res[i][4]}(+)"])
+            prep.append([f"i{res[i][0]} i{res[i][1]}", f"{res[i][2]}({res[i][3]})", f"{''.join(res[i][4])}(+)"])
             lct.append(res[i][4])
         else:
             prep.append([f"i{res[i][0]} i{res[i][1]}", f"{res[i][2]}({res[i][3]})", "-"])
@@ -140,6 +140,16 @@ def create_implicant(letters):
         else:
             result = result[:LETTERS.index(l)] + '1' + result[LETTERS.index(l)+1:]
     return result
+
+def reverse_slashed_state(List):
+    List2_0 = list(List)
+    for item in List2_0:
+        for i in range(len(item)):
+            if item[i][0] == '/':
+                item[i] = item[i][1]
+            else:
+                item[i] = '/' + item[i]
+    return List2_0
 
 def task2_4(pn, ll, internetMode = False):
     print('\n\n2.3')
@@ -257,8 +267,10 @@ def task2_4(pn, ll, internetMode = False):
         listTermXIn = set()
         listTermXOut = set(F0OnlyX)
         repeationDict = {}
+        ResLetter = []
         for i, NumAndLet in enumerate(res):
             number, letter = NumAndLet
+            ResLetter.append(letter)
             for num in number:
                 repeationDict[num] = repeationDict.get(num, 0)  + 1
             SetNumber = set(number)
@@ -325,12 +337,12 @@ def task2_4(pn, ll, internetMode = False):
 
                     lilImpResTr = lilImpRes.replace('x', '-')
 
-                    lilTerm = ''
+                    lilTerm = []
                     for n in range(len(lilImpResTr)):
                         if lilImpResTr[n] == '0':
-                            lilTerm += f"/{LETTERS[n]}"
+                            lilTerm.append( f"/{LETTERS[n]}")
                         elif lilImpResTr[n] == '1':
-                            lilTerm += f"{LETTERS[n]}"
+                            lilTerm.append(f"{LETTERS[n]}")
 
                     #print(table_compared_implicants([implicants[i], implicants[j]], lilImpRes, lilImpResTr, lilTerm))
                     
@@ -339,8 +351,21 @@ def task2_4(pn, ll, internetMode = False):
                     checker[i][j], checker[j][i] = '+', '+'
         tabres, LCT = table_results(impRes)
         print(tabres)
-
-
+        LCT_str = [''.join(i) for i in LCT]
+        print(f'Отже, сполучними термами є: {", ".join(LCT_str)}.')
+        
+        print('Оскільки склеювання проводиться за “0”, то в результаті мінімізації отримаємо диз’юнктивну нормальну форму для інверсного значення функції f :')
+        print('/f = ', end='')
+        FullTerms = ResLetter + LCT
+        for item in FullTerms:
+            print(f'{"".join([i for i in item])}', end='')
+            if FullTerms.index(item) != len(FullTerms) - 1:
+                print(' v ',end='')
+        print("\nПряме значення функції f отримується згідно з правилами Моргана у вигляді кон'юнктивної нормальної форми:")
+        print('f = ', end='')
+        FullTermsReverse = reverse_slashed_state(FullTerms)
+        PrintFunctionAmplicants(FullTermsReverse, ' v ', ' ')
+        print()
 
 if __name__ == '__main__':
     personalNumbers, listedLetters = create_personal_numbers()
