@@ -3,6 +3,7 @@ from tabulate import tabulate
 from main import create_personal_numbers, pause
 from utils.task1_utils import *
 from utils.task2_utils import *
+from utils.task2_image_utils import gen_karnaugh_map_image
 
 
 def testPause():
@@ -283,6 +284,12 @@ def task2_3(pn, ll, internetMode = False):
                 else:
                     print(f'Набори {", ".join(TermsRepeatI)} беруть участь у {i+1} склеюваннях.')
         #print(*res, sep='\n')
+
+
+        # Generating an image
+        # Warning! Chages repeationDict inside
+        gen_karnaugh_map_image(TRUTH_TABLE, res, repeationDict)
+
 
         implicants = [create_implicant(let[1]) for let in res]
         
