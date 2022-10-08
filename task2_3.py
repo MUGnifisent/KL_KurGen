@@ -287,8 +287,8 @@ def task2_3(pn, ll, internetMode = False):
 
 
         # Generating an image
-        # Warning! Chages repeationDict inside
-        gen_karnaugh_map_image(TRUTH_TABLE, res, repeationDict)
+        # Pass filename without extension
+        gen_karnaugh_map_image(TRUTH_TABLE, res, "Завдання 2.3 - карта Карно")
 
 
         implicants = [create_implicant(let[1]) for let in res]
