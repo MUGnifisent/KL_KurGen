@@ -147,7 +147,9 @@ def task2_3(pn, ll, internetMode = False):
     print('\n\n2.3')
 
     TRUTH_TABLE, F0 = generate_starting_tables(pn)
-    F0 = generate_f(pn)[0]
+    F0 = generate_f(pn)[2]
+    for i in range(len(TRUTH_TABLE)):
+        TRUTH_TABLE[i][2] = F0[i]
     F0Only1 = set([hex(i)[2:].upper() for i in range(len(F0)) if F0[i] == '1'])
     F0OnlyX = set([hex(i)[2:].upper() for i in range(len(F0)) if F0[i] == 'x'])
     tableHeaders = ['№', 'edcba', 'f']
