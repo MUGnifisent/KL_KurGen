@@ -4,7 +4,7 @@ from main import create_personal_numbers, pause
 from utils.task1_utils import *
 from utils.task2_utils import *
 from utils.task2_image_utils import gen_karnaugh_map_image
-
+from utils.functions import generate_f
 
 def testPause():
     program_pause = input("Press the <ENTER> key to continue...")
@@ -147,6 +147,7 @@ def task2_3(pn, ll, internetMode = False):
     print('\n\n2.3')
 
     TRUTH_TABLE, F0 = generate_starting_tables(pn)
+    F0 = generate_f(pn)[0]
     F0Only1 = set([hex(i)[2:].upper() for i in range(len(F0)) if F0[i] == '1'])
     F0OnlyX = set([hex(i)[2:].upper() for i in range(len(F0)) if F0[i] == 'x'])
     tableHeaders = ['№', 'edcba', 'f']
